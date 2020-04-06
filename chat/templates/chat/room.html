@@ -160,8 +160,8 @@
     };
 
     function fetchMessages() {
-      //1 is the primary key of the conversation
-      chatSocket.send(JSON.stringify({'command': 'fetch_messages', 'conversation_id': 1}));
+      //1 is the primary key of the conversation                                                                                  
+      chatSocket.send(JSON.stringify({'command': 'fetch_messages', 'conversation_id': 1, 'username':'admin', 'participant_id':5, 'conversation_name':'Nya' }));
     }
 
     function createMessage(data) {

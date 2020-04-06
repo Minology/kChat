@@ -13,7 +13,7 @@ def get_last_10_messages(conversation_id):
     messages = conversation.messages.all().order_by('-created_at')[:10]
     return messages
 
-def get_sender(username):
+def get_user(username):
     return get_object_or_404(User, username=username)
 
 def get_conversation(conversation_id):
