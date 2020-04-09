@@ -1,0 +1,6 @@
+# For windows to run bash
+scripts/remove-cr.sh
+rm-cr.sh
+
+# Others
+README.md
