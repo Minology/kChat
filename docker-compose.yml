@@ -8,7 +8,7 @@ services:
 
   web:
     build: .
-    command: bash scripts/start-web.sh
+    command: bash -c "bash rm-cr.sh && bash scripts/start-web.sh"
     volumes:
       - .:/home/kchat
     ports:
