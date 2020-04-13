@@ -123,7 +123,10 @@ class ChatConsumer(WebsocketConsumer):
 
     def fetch_conversations_of_user(self, data):
         user = get_user(data['username'])
-        conversations = Participant.objects.filter(user=user)
+        participants = Participant.objects.filter(user=user)
+        conversations = []
+        for participant in participants:
+            conversations.append(participant.conversation)
         content = {
             'command': 'conversations_of_user',
             'conversations': self.conversations_to_json(conversations)
