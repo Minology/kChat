@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.admindocs',
     'channels',
     'chat',
+    'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 ]
 

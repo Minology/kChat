@@ -1,9 +1,8 @@
-from django.conf.urls import include
-from django.urls import path
 from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-    path('chat/', include('chat.urls')),
-    path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
+    path('api-auth/', include('rest_framework.urls')),
+    path('chat/', include('chat.api.urls', namespace='chat')),
 ]
