@@ -1,13 +1,27 @@
 import React from 'react';
+import {
+    Switch,
+    Route
+} from 'react-router-dom';
+import LogIn from './LogIn.jsx'
+import Chat from './Chat.jsx'
 
-class App extends React.Component {
+export default class App extends React.Component {
     render() {
         return (
             <div>
-                <h1>Hello World!</h1>
+                <Switch>
+                    <Route exact path="/login">
+                        <LogIn />
+                    </Route>
+                    <Route path="/chat">
+                        <Chat />
+                    </Route>
+                    <Route>
+                        <h1>Not found</h1>
+                    </Route>
+                </Switch>
             </div>
         );
     }
 }
-
-export default App;

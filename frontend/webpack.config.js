@@ -11,7 +11,8 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve('dist'),
-    filename: 'index-bundle.js'
+    filename: 'index-bundle.js',
+    publicPath: '/'
   },
   module: {
     rules: [
@@ -19,6 +20,9 @@ module.exports = {
       { test: /\.jsx$/, use: 'babel-loader', exclude: /node_modules/ },
       { test: /\.css$/i, use: ['style-loader', 'css-loader']},
     ]
+  },
+  devServer: {
+    historyApiFallback: true,
   },
   plugins: [HtmlWebpackPluginConfig]
 }
