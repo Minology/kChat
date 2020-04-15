@@ -95,6 +95,9 @@ DATABASES = {
     }
 }
 
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8080',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

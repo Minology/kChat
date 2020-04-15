@@ -9,6 +9,9 @@ up:
 dev:
 	docker-compose run --rm --name kchat_web -p 8000:8000 web
 
+dev_front:
+	docker-compose run --rm --name kchat_frontend -p 8080:8080 frontend
+
 down:
 	docker-compose down
 

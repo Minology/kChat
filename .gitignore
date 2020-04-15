@@ -50,6 +50,7 @@ node_modules/
 .pnp
 .pnp.js
 
+# misc
 .DS_Store
 .env.local
 .env.development.local
@@ -76,6 +77,7 @@ chrome-user-data
 *.swo
 *react*min*.js
 
+# etc
 kchat_frontend/coverage/
 kchat_frontend/build/
 kchat_frontend/static/
@@ -92,4 +94,9 @@ docs/vendor/bundle
 fixtures/dom/public/react-dom.js
 fixtures/dom/public/react.js
 
+# testing
+/coverage
 test/the-files-to-test.generated.js
+
+# production
+/build
