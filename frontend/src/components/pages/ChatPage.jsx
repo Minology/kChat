@@ -5,13 +5,13 @@ import {
     Redirect,
     useRouteMatch
 } from 'react-router-dom';
-import Conversation from './Conversation.jsx';
+import Conversation from '../Conversation.jsx';
 
-export default function Chat() {
+export default function ChatPage({ currentUser }) {
     let match = useRouteMatch();
     return (
         <div>
-            <h1>Chat</h1>
+            <h1>Chat {currentUser}</h1>
             <Switch>
                 <Route exact path={match.path}>
                     <Redirect to={`${match.path}/1`}/>
