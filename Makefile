@@ -11,6 +11,9 @@ dev:
 
 <<<<<<< HEAD
 =======
+dev_front:
+	docker-compose run --rm --name kchat_frontend -p 8080:8080 frontend
+
 >>>>>>> dev
 down:
 	docker-compose down

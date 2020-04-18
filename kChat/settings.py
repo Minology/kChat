@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+<<<<<<< HEAD
 
     'logAPI',
     'rest_auth',
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
 
     'allauth',
     'allauth.account',
+=======
 >>>>>>> dev
 ]
 
@@ -104,6 +106,8 @@ DATABASES = {
     }
 }
 
+<<<<<<< HEAD
+=======
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8080',
 )
@@ -149,6 +153,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+<<<<<<< HEAD
 
 
 # Rest auth settings
@@ -209,4 +214,5 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'auth.user'
+=======
 >>>>>>> dev

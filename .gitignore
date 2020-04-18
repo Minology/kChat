@@ -52,6 +52,7 @@ node_modules/
 
 <<<<<<< HEAD
 =======
+# misc
 >>>>>>> dev
 .DS_Store
 .env.local
@@ -81,6 +82,8 @@ chrome-user-data
 
 <<<<<<< HEAD
 =======
+# etc
+>>>>>>> dev
 kchat_frontend/coverage/
 kchat_frontend/build/
 kchat_frontend/static/
@@ -100,3 +103,10 @@ fixtures/dom/public/react.js
 <<<<<<< HEAD
 test/the-files-to-test.generated.js
 =======
+# testing
+/coverage
+test/the-files-to-test.generated.js
+
+# production
+/build
+>>>>>>> dev

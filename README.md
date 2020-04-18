@@ -42,3 +42,5 @@ $ docker-compose exec web python manage.py createsuperuser
 <<<<<<< HEAD
 - Go to http://127.0.0.1:8000/chat/example/
 =======
+- Go to http://127.0.0.1:8080
+>>>>>>> dev
