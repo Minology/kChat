@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
     'allauth',
     'allauth.account',
+>>>>>>> dev
 ]
 
 MIDDLEWARE = [
@@ -103,6 +104,10 @@ DATABASES = {
     }
 }
 
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8080',
+)
+>>>>>>> dev
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -204,3 +209,4 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'auth.user'
+>>>>>>> dev

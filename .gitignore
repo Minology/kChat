@@ -50,6 +50,9 @@ node_modules/
 .pnp
 .pnp.js
 
+<<<<<<< HEAD
+=======
+>>>>>>> dev
 .DS_Store
 .env.local
 .env.development.local
@@ -76,6 +79,8 @@ chrome-user-data
 *.swo
 *react*min*.js
 
+<<<<<<< HEAD
+=======
 kchat_frontend/coverage/
 kchat_frontend/build/
 kchat_frontend/static/
@@ -92,4 +97,6 @@ docs/vendor/bundle
 fixtures/dom/public/react-dom.js
 fixtures/dom/public/react.js
 
+<<<<<<< HEAD
 test/the-files-to-test.generated.js
+=======

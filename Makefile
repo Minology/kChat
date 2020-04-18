@@ -9,6 +9,9 @@ up:
 dev:
 	docker-compose run --rm --name kchat_web -p 8000:8000 web
 
+<<<<<<< HEAD
+=======
+>>>>>>> dev
 down:
 	docker-compose down
 
