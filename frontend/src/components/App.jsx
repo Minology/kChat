@@ -10,7 +10,6 @@ import NotFoundPage from './NotFoundPage.jsx';
 import HomePage from './home/HomePage.jsx';
 import LoginPage from './auth/LoginPage.jsx';
 import ChatPage from './chat/ChatPage.jsx';
-import WebSocketInstance from '../services/WebSocket';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -29,7 +28,6 @@ export default class App extends React.Component {
             username: username,
             isAuthenticated: true 
         });
-        WebSocketInstance.connect();
         cb();
     }
 

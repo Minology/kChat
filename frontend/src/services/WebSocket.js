@@ -12,27 +12,29 @@ class WebSocketService {
     }
 
     constructor() {
-        this.socketRef = null;
+        this.socketRef = {};
     }
 
-    connect() {
-        const path = config.API_PATH;
-        this.socketRef = new ReconnectingWebSocket(path);
+    connect(conversationId) {
+        if (this.socketRef[conversationId]) return;
 
-        this.socketRef.onopen = () => {
-            console.log('WebSocket open');
+        const path = config.API_PATH + conversationId + '/';
+        this.socketRef[conversationId] = new ReconnectingWebSocket(path);
+
+        this.socketRef[conversationId].onopen = () => {
+            console.log('WebSocket at ' + conversationId + ' open');
         };
 
-        this.socketRef.onmessage = e => {
+        this.socketRef[conversationId].onmessage = e => {
             this.socketNewMessage(e.data);
         };
 
-        this.socketRef.onerror = e => {
+        this.socketRef[conversationId].onerror = e => {
             console.log(e.message);
         };
 
-        this.socketRef.onclose = () => {
-            console.log("WebSocket closed let's reopen");
+        this.socketRef[conversationId].onclose = () => {
+            console.log("WebSocket closed at " + conversationId + " let's reopen");
             this.connect();
         };
     }
@@ -75,19 +77,19 @@ class WebSocketService {
   
     sendMessage(data) {
         try {
-            this.socketRef.send(JSON.stringify({ ...data }));
+            this.socketRef[data.conversation_id].send(JSON.stringify({ ...data }));
         }
         catch(err) {
             console.log(err.message);
         }  
     }
 
-    state() {
-        return this.socketRef.readyState;
+    state(conversationId) {
+        return this.socketRef[conversationId].readyState;
     }
 
-    waitForSocketConnection(callback){
-        const socket = this.socketRef;
+    waitForSocketConnection(conversationId, callback){
+        const socket = this.socketRef[conversationId];
         const recursion = this.waitForSocketConnection;
         setTimeout(() => {
             if (socket.readyState === 1) {

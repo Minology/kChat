@@ -8,38 +8,56 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
         <title>kChat</title>
         <!-- Fevicon -->
-        <link rel="shortcut icon" href="../public/favicon.ico">
+        <script>
+            const resources_path = "http://" + window.location.host + "/public/";
+            document.write('<link rel="shortcut icon" href="' + resources_path + 'favicon.ico">');
+        </script>
         <!-- Slick css -->
         <link 
             href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
             rel="stylesheet" 
             integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
-            crossorigin="anonymous">        
-        <!--<link href="../public/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">-->
-        <link href="../public/assets/plugins/slick/slick.css" rel="stylesheet">
-        <link href="../public/assets/plugins/slick/slick-theme.css" rel="stylesheet">
-        <link href="../public/assets/css/icons.css" rel="stylesheet" type="text/css">
-        <link href="../public/assets/css/flag-icon.min.css" rel="stylesheet" type="text/css">
-        <link href="../public/assets/css/style.css" rel="stylesheet" type="text/css">
+            crossorigin="anonymous">
+        <script>
+            //document.write('<link href="' + resources_path + 'assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">');
+            document.write('<link href="' + resources_path + 'assets/plugins/slick/slick.css" rel="stylesheet">');
+            document.write('<link href="' + resources_path + 'assets/plugins/slick/slick-theme.css" rel="stylesheet">');
+            document.write('<link href="' + resources_path + 'assets/css/icons.css" rel="stylesheet" type="text/css">');
+            document.write('<link href="' + resources_path + 'assets/css/flag-icon.min.css" rel="stylesheet" type="text/css">');
+            document.write('<link href="' + resources_path + 'assets/css/style.css" rel="stylesheet" type="text/css">');
+        </script>
         <!-- End css -->
     </head>
     <body class="dark-layout">
         <div id="root">
 
         </div>
-        <!-- Start js -->        
-        <script src="../public/assets/js/jquery.min.js"></script>
-        <script src="../public/assets/js/popper.min.js"></script>
-        <script src="../public/assets/js/bootstrap.min.js"></script>
-        <script src="../public/assets/js/modernizr.min.js"></script>
-        <script src="../public/assets/js/detect.js"></script>
-        <script src="../public/assets/js/jquery.slimscroll.js"></script>
-        <script src="../public/assets/js/vertical-menu.js"></script>
-        <script src="../public/assets/js/reconnecting-websocket.js"></script>
-        <!-- Slick js -->
-        <script src="../public/assets/plugins/slick/slick.min.js"></script>
-        <!-- Core js -->
-        <script src="../public/assets/js/core.js"></script>
-        <!-- End js -->
+        <script>
+            document.write('<!-- Start js -->');
+            let script = document.createElement('script');
+            script.src = resources_path + 'assets/js/jquery.min.js';
+            document.write(script.outerHTML);
+            script.src = resources_path + 'assets/js/popper.min.js';
+            document.write(script.outerHTML);
+            script.src = resources_path + 'assets/js/bootstrap.min.js';
+            document.write(script.outerHTML);
+            script.src = resources_path + 'assets/js/modernizr.min.js';
+            document.write(script.outerHTML);
+            script.src = resources_path + 'assets/js/detect.js';
+            document.write(script.outerHTML);
+            script.src = resources_path + 'assets/js/jquery.slimscroll.js';
+            document.write(script.outerHTML);
+            script.src = resources_path + 'assets/js/vertical-menu.js';
+            document.write(script.outerHTML);
+            script.src = resources_path + 'assets/js/reconnecting-websocket.js';
+            document.write(script.outerHTML);
+            document.write('<!-- Slick js -->');
+            script.src = resources_path + 'assets/plugins/slick/slick.min.js';
+            document.write(script.outerHTML);
+            document.write('<!-- Core js -->');
+            script.src = resources_path + 'assets/js/core.js';
+            document.write(script.outerHTML);
+            document.write('<!-- End js -->');
+        </script>
     </body>
 </html>

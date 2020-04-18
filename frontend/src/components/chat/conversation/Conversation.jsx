@@ -11,9 +11,9 @@ export default class Conversation extends React.Component {
             messageList: [],
             errored: false
         }
-
+        
         this.waitForSocketConnection(() => {
-            WebSocketInstance.addCallbacks(this.setMessageList.bind(this), this.addMessage.bind(this))
+            WebSocketInstance.addCallbacks(this.setMessageList.bind(this), this.getMessage.bind(this))
             WebSocketInstance.fetchMessages(this.props.details.id);
         });
     }
@@ -22,7 +22,7 @@ export default class Conversation extends React.Component {
         const component = this;
         setTimeout(() => {
             // Check if websocket state is OPEN
-            if (WebSocketInstance.state() === 1) {
+            if (WebSocketInstance.state(this.props.details.id) === 1) {
                 console.log("Connection is made")
                 callback();
                 return;
@@ -44,31 +44,36 @@ export default class Conversation extends React.Component {
     scrollToBottom = () => {
         this.messagesEnd.scrollIntoView({ behavior: "smooth" });
     }
+
+    processMessage = (message) => {
+        return {
+            id: message.id,
+            conversationId: message.conversation,
+            created_at: message.created_at,
+            content: message.message,
+            sender: message.sender,
+            attachment_type: message.attachment_type,
+        }
+    }
     
     setMessageList(response) {
         let messageList = [];
 
         response.reverse().forEach(message => {
-            messageList = messageList.concat({
-                id: message.id,
-                created_at: message.created_at,
-                content: message.message,
-                sender: message.sender,
-                attachment_type: message.attachment_type,
-            });
+            messageList = messageList.concat(this.processMessage(message));
         });
 
         this.setState({ messageList: messageList});
+        this.props.updateLastMessage(messageList[messageList.length - 1], true);
     }
 
-    addMessage(message) {
-        this.setState({ messageList: [...this.state.messageList, {
-            id: message.id,
-            created_at: message.created_at,
-            content: message.message,
-            sender: message.sender,
-            attachment_type: message.attachment_type,
-        }]});
+    getMessage(message) {
+        message = this.processMessage(message);
+        const isSeen = message.conversationId == this.props.details.id;
+        if (isSeen) {
+            this.setState({ messageList: [...this.state.messageList, message]});
+        }
+        this.props.updateLastMessage(message, isSeen);
     }
 
     sendMessage = (message) => {

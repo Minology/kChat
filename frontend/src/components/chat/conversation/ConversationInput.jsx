@@ -44,7 +44,7 @@ export default class ConversationInput extends React.Component {
                                 <i className="feather icon-paperclip"></i>
                             </a>
                             <a id="button-addonsend" onClick={this.handleSubmit}>
-                                <i className="feather icon-send" type="submit"></i>
+                                <i className="feather icon-send"></i>
                             </a>
                         </div>
                     </div>

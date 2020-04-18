@@ -1,7 +1,7 @@
 import React from 'react';
 import MessageTime from './MessageTime.js';
 
-export default function Message({ currentUser, message, prevMessageTime }) {
+export default function Message({ currentUser, message, prevMessageTime=0 }) {
     let getClassName = () => {
         return "chat-message " + (currentUser == message.sender ? "chat-message-right" : "chat-message-left");
     }
