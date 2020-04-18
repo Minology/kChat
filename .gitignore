@@ -50,8 +50,6 @@ node_modules/
 .pnp
 .pnp.js
 
-<<<<<<< HEAD
-=======
 # misc
 >>>>>>> dev
 .DS_Store
@@ -80,10 +78,8 @@ chrome-user-data
 *.swo
 *react*min*.js
 
-<<<<<<< HEAD
-=======
+
 # etc
->>>>>>> dev
 kchat_frontend/coverage/
 kchat_frontend/build/
 kchat_frontend/static/
@@ -109,4 +105,3 @@ test/the-files-to-test.generated.js
 
 # production
 /build
->>>>>>> dev

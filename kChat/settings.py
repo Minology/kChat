@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-<<<<<<< HEAD
 
     'logAPI',
     'rest_auth',
@@ -52,8 +51,7 @@ INSTALLED_APPS = [
 
     'allauth',
     'allauth.account',
-=======
->>>>>>> dev
+
 ]
 
 MIDDLEWARE = [
@@ -106,12 +104,9 @@ DATABASES = {
     }
 }
 
-<<<<<<< HEAD
-=======
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8080',
 )
->>>>>>> dev
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -153,8 +148,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
-<<<<<<< HEAD
-
 
 # Rest auth settings
 OLD_PASSWORD_FIELD_ENABLED = True
@@ -214,5 +207,4 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'auth.user'
-=======
->>>>>>> dev
+
