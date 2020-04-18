@@ -46,7 +46,7 @@ export default function Chat({ client, currentUser }) {
     let getConversationRoutes = () => {
         return conversationList.map((conversation, i) => (
             <Route key={i} path={`${match.path}/${conversation.id}`}>
-                <Conversation client={client} currentUser={currentUser} details={conversation} />
+                <Conversation currentUser={currentUser} details={conversation} />
             </Route>
         ));
     }

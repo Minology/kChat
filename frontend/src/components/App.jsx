@@ -29,7 +29,7 @@ export default class App extends React.Component {
             username: username,
             isAuthenticated: true 
         });
-        //WebSocketInstance.connect();
+        WebSocketInstance.connect();
         cb();
     }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import Message from './Message.jsx';
 
-export default function MessageList({ client, currentUser, messages }) {
+export default function MessageList({ currentUser, messages }) {
     let getMessageList = () => {
         return messages.map((message, index) => 
             <Message 

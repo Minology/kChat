@@ -8,7 +8,7 @@ export default function Message({ currentUser, message, prevMessageTime }) {
 
     let getMessage = () => {
         switch (message.attachment_type) {
-            case 1:
+            case "Only text":
                 return getTextMessage(message.content);
         }
     }
