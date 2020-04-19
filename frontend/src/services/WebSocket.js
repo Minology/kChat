@@ -15,7 +15,7 @@ class WebSocketService {
         this.socketRef = {};
     }
 
-    connect(conversationId) {
+    connect(conversationId=0) {
         if (this.socketRef[conversationId]) return;
 
         const path = config.API_PATH + conversationId + '/';
@@ -51,17 +51,29 @@ class WebSocketService {
         if (command === 'new_message') {
             this.callbacks[command](parsedData.message);
         }
+        if (command == 'create_conversation') {
+            this.callbacks[command]({
+                successful: parsedData.log == 'successful',
+                conversation: parsedData.conversation,
+            });
+        }
+        if (command == 'add_user_to_conversation') {
+            this.callbacks[command]({
+                successful: parsedData.log == 'successful',
+                username: parsedData.user.username,
+            });
+        }
     }
 
     fetchMessages(conversationId) {
-        this.sendMessage({ 
+        this.sendMessage(conversationId, { 
             command: 'fetch_messages', 
             conversation_id: conversationId,
         });
     }
 
     newChatMessage(message) {
-        this.sendMessage({ 
+        this.sendMessage(message.conversationId, { 
             command: 'new_message', 
             from: message.from,
             conversation_id: message.conversationId,
@@ -70,14 +82,31 @@ class WebSocketService {
         }); 
     }
 
-    addCallbacks(messagesCallback, newMessageCallback) {
-        this.callbacks['messages'] = messagesCallback;
-        this.callbacks['new_message'] = newMessageCallback;
+    newConversation(conversationName, creator) {
+        this.sendMessage(0, {
+            command: 'create_conversation',
+            conversation_name: conversationName,
+            username: creator,
+        });
+    }
+
+    addUserToConversation(conversationId, username) {
+        this.sendMessage(conversationId, {
+            command: 'add_user_to_conversation',
+            conversation_id: conversationId,
+            username: username,
+        });
+    }
+
+    addCallbacks(callbackOfCommand) {
+        Object.keys(callbackOfCommand).forEach((command) => {
+            this.callbacks[command] = callbackOfCommand[command];
+        });
     }
   
-    sendMessage(data) {
+    sendMessage(conversationId, data) {
         try {
-            this.socketRef[data.conversation_id].send(JSON.stringify({ ...data }));
+            this.socketRef[conversationId].send(JSON.stringify({ ...data }));
         }
         catch(err) {
             console.log(err.message);
@@ -88,23 +117,21 @@ class WebSocketService {
         return this.socketRef[conversationId].readyState;
     }
 
-    waitForSocketConnection(conversationId, callback){
+    waitForSocketConnection = (conversationId=0, timeout=5, callback) => {
         const socket = this.socketRef[conversationId];
-        const recursion = this.waitForSocketConnection;
         setTimeout(() => {
             if (socket.readyState === 1) {
                 console.log("Connection is made")
-                if (callback != null) {
+                if (callback) {
                     callback();
                 }
                 return;
             } else {
                 console.log("wait for connection...")
-                recursion(callback);
+                this.waitForSocketConnection(conversationId, timeout, callback);
             }
-        }, 1); // wait 5 milisecond for the connection...
+        }, timeout); // wait 5 milisecond for the connection...
     }
-
 }
 
 const WebSocketInstance = WebSocketService.getInstance();

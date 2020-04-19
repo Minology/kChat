@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Switch,
     Route,
@@ -16,7 +16,6 @@ import WebSocketInstance from '../../services/WebSocket.js';
 export default function Chat({ client, currentUser }) {
     const [conversationList, setConversationList] = useState([]);
     const [lastMessage, setLastMessage] = useState({});
-    const [fetched, setFetched] = useState(false);
     const [errored, setErrored] = useState(false);
     const [tab, setTab] = useState("chat");
 
@@ -33,7 +32,6 @@ export default function Chat({ client, currentUser }) {
             WebSocketInstance.connect(conversation.id);
         });
 
-        setFetched(true);
         setConversationList(results);
     }
 
@@ -47,6 +45,8 @@ export default function Chat({ client, currentUser }) {
             .then(handleResponse)
             .catch(handleError);
     }
+
+    useEffect(fetchConversationList, []);
 
     let updateLastMessage = (message, isSeen) => {
         let newLastMessage = JSON.parse(JSON.stringify(lastMessage));
@@ -86,7 +86,6 @@ export default function Chat({ client, currentUser }) {
         ));
     }
 
-    if (!fetched) fetchConversationList();
     return (
         <div className="chat-layout">
             <div className="chat-leftbar">

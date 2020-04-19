@@ -14,9 +14,10 @@ export default class ConversationInput extends React.Component {
     }
 
     handleSubmit = (event) => {
+        event.preventDefault();
+        if (!this.state.message) return;
         this.props.sendMessage(this.state.message);
         this.setState({message: ''});
-        event.preventDefault();
     }
 
     render() {

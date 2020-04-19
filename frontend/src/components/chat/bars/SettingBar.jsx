@@ -1,15 +1,15 @@
 import React from 'react';
-import Checkbox from '../../Checkbox.jsx';
+import SettingOption from '../../SettingOption.jsx';
 
 export default function SettingBar() {
     const generalOptions = ["Notification Sounds", "New Message Alerts", "Show Mini Messages in Sidebar"];
     let getGeneralSettings = () => {
-        return generalOptions.map((option, index) => <Checkbox key={index} name={option}/>);
+        return generalOptions.map((option, index) => <SettingOption key={index} name={option}/>);
     }
 
     const privacyOptions = ["Read Receipts", "Show Profile Picture", "Allow Messages from Strangers"];
     let getPrivacySettings = () => {
-        return privacyOptions.map((option, index) => <Checkbox key={index} name={option} style="custom-switch"/>);
+        return privacyOptions.map((option, index) => <SettingOption key={index} name={option} style="custom-switch"/>);
     }
 
     const designOptions = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"];

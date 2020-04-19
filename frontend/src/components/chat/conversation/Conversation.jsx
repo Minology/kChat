@@ -12,25 +12,13 @@ export default class Conversation extends React.Component {
             errored: false
         }
         
-        this.waitForSocketConnection(() => {
-            WebSocketInstance.addCallbacks(this.setMessageList.bind(this), this.getMessage.bind(this))
+        WebSocketInstance.waitForSocketConnection(this.props.details.id, 100, () => {
+            WebSocketInstance.addCallbacks({
+                'messages': this.setMessageList,
+                'new_message': this.getMessage
+            });
             WebSocketInstance.fetchMessages(this.props.details.id);
         });
-    }
-
-    waitForSocketConnection(callback) {
-        const component = this;
-        setTimeout(() => {
-            // Check if websocket state is OPEN
-            if (WebSocketInstance.state(this.props.details.id) === 1) {
-                console.log("Connection is made")
-                callback();
-                return;
-            } else {
-              console.log("wait for connection...")
-              component.waitForSocketConnection(callback);
-            }
-        }, 100); // wait 100 milisecond for the connection...
     }
 
     componentDidMount() {
@@ -56,7 +44,7 @@ export default class Conversation extends React.Component {
         }
     }
     
-    setMessageList(response) {
+    setMessageList = (response) => {
         let messageList = [];
 
         response.reverse().forEach(message => {
@@ -67,7 +55,7 @@ export default class Conversation extends React.Component {
         this.props.updateLastMessage(messageList[messageList.length - 1], true);
     }
 
-    getMessage(message) {
+    getMessage = (message) => {
         message = this.processMessage(message);
         const isSeen = message.conversationId == this.props.details.id;
         if (isSeen) {
