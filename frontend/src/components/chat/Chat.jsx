@@ -13,8 +13,7 @@ import ProfileBar from './bars/ProfileBar.jsx';
 import SettingBar from './bars/SettingBar.jsx';
 import WebSocketInstance from '../../services/WebSocket.js';
 
-export default function Chat({ client, currentUser }) {
-    const [conversationList, setConversationList] = useState([]);
+export default function Chat({ client, currentUser, conversationList,  setConversationList}) {
     const [lastMessage, setLastMessage] = useState({});
     const [errored, setErrored] = useState(false);
     const [tab, setTab] = useState("chat");

@@ -10,8 +10,6 @@ export default class NewConversationModal extends React.Component {
             newConversation: "",
             usersToAdd: {},
         }
-
-        this.conversation = undefined;
         
         WebSocketInstance.connect();
         
@@ -25,7 +23,14 @@ export default class NewConversationModal extends React.Component {
 
     addUsers = (response) => {
         if (response.successful) {
-            this.conversation = response.conversation;
+            const conversation = response.conversation;
+            this.props.setConversationList([...this.props.conversationList, {
+                id: conversation.conversation_id,
+                title: conversation.title,
+                creator: conversation.creator_username,
+                created_at: conversation.created_at,
+            }]);
+            if (this.props.currentUser != response.conversation.creator_username) return;
 
             WebSocketInstance.connect(conversation.conversation_id);
             WebSocketInstance.waitForSocketConnection(conversation.conversation_id, 100, () => {
@@ -34,10 +39,12 @@ export default class NewConversationModal extends React.Component {
                 });
             });
             this.setState({
-                newConversation: ""
+                newConversation: "",
             });
+            this.refs.hiddenButton.click();
         }
         else {
+            if (this.props.currentUser != response.conversation.creator_username) return;
             console.log("Creating new conversation failed. Let's try again...");
             WebSocketInstance.newConversation(this.state.newConversationName, this.props.currentUser);
         }
@@ -45,7 +52,8 @@ export default class NewConversationModal extends React.Component {
 
     handleFailedAddUserRequest = (response) => {
         if (!response.successful) {
-            WebSocketInstance.addUserToConversation(this.conversation.conversation_id, response.username);
+            console.log("Add " + response.username + " failed!");
+            //WebSocketInstance.addUserToConversation(this.conversation.conversation_id, response.username);
         }
     }
 
@@ -67,7 +75,7 @@ export default class NewConversationModal extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        WebSocketInstance.newConversation(this.state.newConversationName, this.props.currentUser);
+        WebSocketInstance.newConversation(this.state.newConversation, this.props.currentUser);
     }
 
     getUsersToAddAvatars = () => {
@@ -112,8 +120,11 @@ export default class NewConversationModal extends React.Component {
                         <UserList excludedUsers={[currentUser]} withCheckbox={true} checkedUsers={usersToAdd} onChange={this.handleUsersChange}/>
                     </div>
                     <div className="mt-3 text-center">
-                        <button type="submit" className="btn btn-primary"><i className="feather icon-plus mr-2"></i>Create Group</button>
+                        <button type="submit" className="btn btn-primary">
+                            <i className="feather icon-plus mr-2"></i>Create Group
+                        </button>
                     </div>
+                    <div ref="hiddenButton" data-dismiss="modal"></div>
                 </form>
             </div>
         )

@@ -19,7 +19,7 @@ class WebSocketService {
         if (this.socketRef[conversationId]) return;
 
         const path = config.API_PATH + conversationId + '/';
-        this.socketRef[conversationId] = new ReconnectingWebSocket(path);
+        this.socketRef[conversationId] = new ReconnectingWebSocket(path, null, {debug: true});
 
         this.socketRef[conversationId].onopen = () => {
             console.log('WebSocket at ' + conversationId + ' open');
@@ -35,7 +35,6 @@ class WebSocketService {
 
         this.socketRef[conversationId].onclose = () => {
             console.log("WebSocket closed at " + conversationId + " let's reopen");
-            this.connect();
         };
     }
 

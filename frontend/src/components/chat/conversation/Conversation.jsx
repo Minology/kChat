@@ -45,6 +45,7 @@ export default class Conversation extends React.Component {
     }
     
     setMessageList = (response) => {
+        if (response.length == 0) return;
         let messageList = [];
 
         response.reverse().forEach(message => {

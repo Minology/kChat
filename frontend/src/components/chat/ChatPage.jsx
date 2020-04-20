@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Switch,
     Route,
@@ -9,14 +9,25 @@ import ModalContainer from './modals/ModalContainer.jsx';
 import NewConversationModal from './modals/NewConversationModal.jsx';
 
 export default function ChatPage({ client, currentUser }) {
+    const [conversationList, setConversationList] = useState([]);
+
     let match = useRouteMatch();
     return (
         <Switch>
             <Route path={match.path}>
                 <ModalContainer modalName="createGroup" fullname="Create Group">
-                    <NewConversationModal currentUser={currentUser}/>
+                    <NewConversationModal 
+                        currentUser={currentUser}
+                        conversationList={conversationList}
+                        setConversationList={setConversationList}
+                    />
                 </ModalContainer>
-                <Chat client={client} currentUser={currentUser} />
+                <Chat 
+                    client={client}
+                    currentUser={currentUser}
+                    conversationList={conversationList}
+                    setConversationList={setConversationList}
+                />
             </Route>
         </Switch>
     )
