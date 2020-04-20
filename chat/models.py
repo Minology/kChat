@@ -64,6 +64,7 @@ class Participant(models.Model):
     deleted_at = models.DateTimeField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name = 'participants')
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name = 'participants')
+    last_seen_message_id = models.IntegerField(default=None, null=True, blank=True)
 
     def __str__(self):
         return self.user.username + ' - ' + self.conversation.title
