@@ -11,8 +11,6 @@ User = get_user_model()
 class ChatConsumer(WebsocketConsumer):
     # fetch last 10 messages of a group chat
     def fetch_messages(self, data):
-        mydata = {'username':'admin', 'conversation_id':1, 'friend_username':'root', 'from_username':'admin','to_username':'descendingblade'}
-        self.decline_friend_request(mydata)
         messages = get_last_10_messages(data['conversation_id'])
         content = {
             'command': 'messages',
