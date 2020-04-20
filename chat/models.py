@@ -9,10 +9,6 @@ User = get_user_model()
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    quote = models.TextField(default='', max_length=50)
-    email = models.EmailField(unique=True,null=True)
-    place = models.TextField(default='')
-    avatar = models.URLField(default='')
     
     def __str__(self):
         return self.user.username
@@ -68,31 +64,13 @@ class Participant(models.Model):
     def __str__(self):
         return self.user.username + ' - ' + self.conversation.title
 
-    class Meta:
-        unique_together = ('user', 'conversation')
-
 
 class Attachment(models.Model):  
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name = 'attachments')
     url = models.CharField(max_length=254)
 
 
-class Connection(models.Model):
-    created_at = models.DateTimeField(default=timezone.now)
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='connections')
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    class Meta:
-        unique_together = ('from_user', 'to_user')
-
-
-class FriendRequest(models.Model):
-    created_at = models.DateTimeField(default=timezone.now)
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE)
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friend_requests')
-
-    class Meta:
-        unique_together = ('from_user', 'to_user')
 
 
 
