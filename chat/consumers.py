@@ -3,7 +3,7 @@ from channels.generic.websocket import WebsocketConsumer
 from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
 from .models import Message, Conversation, AttachmentType, Participant, Connection, FriendRequest
-from .views import get_last_10_messages, get_user, get_conversation, get_attachment_type
+from .views import get_last_10_messages, get_user, get_conversation, get_attachment_type, get_participant
 
 User = get_user_model()
 
@@ -317,6 +317,32 @@ class ChatConsumer(WebsocketConsumer):
         }
         self.send_data(content)
 
+    def fetch_last_seen_message_of_participants(self, data):
+        conversation = get_conversation(data['conversation_id'])
+        participants = Participant.objects.filter(conversation=conversation)
+        last_seen_messages_id = {}
+        for participant in participants:
+            last_seen_message_id = participant.last_seen_message_id
+            last_seen_messages_id[participant.id] = last_seen_message_id
+        content = {
+            'command': 'last_seen_message',
+            'last_seen': last_seen_messages_id
+        }        
+        self.send_data(content)
+
+    def update_last_seen_message(self, data):
+        user = get_user(data['username'])
+        conversation = get_conversation(data['conversation_id'])
+        participant = get_participant(user=user, conversation=conversation)
+        if (participant.last_seen_message_id is None) or (participant.last_seen_message_id < data['last_seen_message_id']):
+            participant.last_seen_message_id = data['last_seen_message_id']
+            participant.save() 
+        content = {
+            'command': 'update_last_seen_message',
+            'log': 'Update last seen message successful',
+        }
+        self.send_data(content)
+
     def users_to_json(self, users):
         result = []
         for user in users:
@@ -387,4 +413,6 @@ class ChatConsumer(WebsocketConsumer):
         'decline_friend_request': decline_friend_request,
         'remove_friend': remove_friend,
         'fetch_friends_outside_of_conversation': fetch_friends_outside_of_conversation,
+        'update_last_seen_message': update_last_seen_message,
+        'fetch_last_seen_message_of_participants': fetch_last_seen_message_of_participants,
     }
