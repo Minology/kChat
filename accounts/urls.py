@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
     url('^registration/$', RegisterView.as_view(), name='register'),
     url(r'^verify-email/$', VerifyEmailView.as_view(), name='account_email_verification_sent'),
-    url(r'^confirm-email/(?P<key>[-:\w]+)/$', LoginView.as_view(), name="account_confirm_email"),
+    url(r'^confirm-email/(?P<key>[-:\w]+)/$', ConfirmEmailView.as_view(), name="account_confirm_email"),
 ]

@@ -9,6 +9,6 @@ urlpatterns = [
     # The view from the urlpattern below is for sample only
     path('chat/', include('chat.urls', namespace='chatview')),
 
-    #logAPI
-    path('logAPI/', include('logAPI.urls')),
+    #accounts
+    path('accounts/', include('accounts.urls')),
 ]
