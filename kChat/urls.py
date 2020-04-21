@@ -9,4 +9,7 @@ urlpatterns = [
 
     # The view from the urlpattern below is for sample only
     path('chat/', include('chat.urls', namespace='chatview')),
+
+    #accounts
+    path('accounts/', include('accounts.urls')),
 ]

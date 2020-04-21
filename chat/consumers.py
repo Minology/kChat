@@ -1,11 +1,8 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
-from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
-from .models import Message, Conversation, AttachmentType, Participant, Connection, FriendRequest
+from .models import Message, Conversation, AttachmentType, Participant, Connection, FriendRequest, User
 from .views import get_last_10_messages, get_user, get_conversation, get_attachment_type, get_participant
-
-User = get_user_model()
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -355,9 +352,9 @@ class ChatConsumer(WebsocketConsumer):
             'username': user.username,            
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'email': user.profile.email,
-            'quote': user.profile.quote,
-            'place': user.profile.place,
+            'email': user.email,
+            'quote': user.quote,
+            'place': user.place,
         } 
 
     def conversations_to_json(self, conversations):
