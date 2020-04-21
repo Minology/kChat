@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'logAPI',
+
+    'accounts',
     'rest_auth',
     'rest_auth.registration',
     'django.contrib.sites',
@@ -148,12 +150,12 @@ STATICFILES_DIRS = [
 # Rest auth settings
 OLD_PASSWORD_FIELD_ENABLED = True
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'logAPI.serializers.RegisterSerializer'
+    'REGISTER_SERIALIZER': 'accounts.serializers.RegisterSerializer'
 }
 
 
 REST_AUTH_SERIALIZERS = {
-    'LOGIN_SERIALIZER': 'logAPI.serializers.LoginSerializer',
+    'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
 }
 
 # Email backend settings
