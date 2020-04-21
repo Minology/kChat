@@ -2,11 +2,13 @@ import React from 'react';
 import ChatSearch from '../ChatSearch.jsx';
 import UserList from '../../UserList.jsx';
 import WebSocketInstance from '../../../services/WebSocket.js';
+import UserInfo from '../../../UserInfo.js';
 
 export default class NewConversationModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            friendList: [],
             newConversation: "",
             usersToAdd: {},
         }
@@ -15,10 +17,28 @@ export default class NewConversationModal extends React.Component {
         
         WebSocketInstance.waitForSocketConnection(0, 100, () => {
             WebSocketInstance.addCallbacks({
+                'fetch_all_friends': this.setFriendList,
                 'create_conversation': this.addUsers,
                 'add_user_to_conversation': this.handleFailedAddUserRequest,
             });
+            WebSocketInstance.fetchFriends(this.props.currentUser);
         });
+    }
+
+    setFriendList = (friends) => {
+        let newFiendList = friends.map(friend => {
+            return new UserInfo(
+                friend.user_id,
+                friend.username,
+                friend.first_name,
+                friend.last_name,
+                friend.email,
+                friend.quote,
+                friend.place
+            );
+        });
+
+        this.setState({friendList: newFiendList});
     }
 
     addUsers = (response) => {
@@ -89,7 +109,7 @@ export default class NewConversationModal extends React.Component {
     }
 
     render() {
-        const currentUser = this.props.currentUser;
+        const friendList = this.state.friendList;
         const newConversationName = this.state.newConversation;
         const usersToAdd = this.state.usersToAdd;
         return (
@@ -117,7 +137,7 @@ export default class NewConversationModal extends React.Component {
                     </div>
                     <ChatSearch />
                     <div className="add-users-list">
-                        <UserList excludedUsers={[currentUser]} withCheckbox={true} checkedUsers={usersToAdd} onChange={this.handleUsersChange}/>
+                        <UserList userInfos={friendList} withCheckbox={true} checkedUsers={usersToAdd} onChange={this.handleUsersChange}/>
                     </div>
                     <div className="mt-3 text-center">
                         <button type="submit" className="btn btn-primary">

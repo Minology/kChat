@@ -9,8 +9,10 @@ export default class MessageTime {
         this.date = months[this.time.getMonth() - 1] + " " + this.time.getDate() + ", " + this.time.getFullYear();
 
         this.hours = this.time.getHours() < 12? this.time.getHours() : this.time.getHours() - 12;
+        if (this.hours < 10) this.hours = '0' + this.hours;
         this.hoursSuffix = this.time.getHours() < 12? "AM" : "PM";
         this.minutes = this.time.getMinutes();
+        if (this.minutes < 10) this.minutes = '0' + this.minutes;
     }
 
     toTimeString() {

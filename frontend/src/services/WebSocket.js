@@ -50,6 +50,9 @@ class WebSocketService {
         if (command === 'new_message') {
             this.callbacks[command](parsedData.message);
         }
+        if (command == 'fetch_all_friends') {
+            this.callbacks[command](parsedData.friends);
+        }
         if (command == 'create_conversation') {
             this.callbacks[command]({
                 successful: parsedData.log == 'successful',
@@ -62,12 +65,22 @@ class WebSocketService {
                 username: parsedData.user.username,
             });
         }
+        if (command == 'fetch_user_info') {
+            this.callbacks[command](parsedData.user);
+        }
     }
 
     fetchMessages(conversationId) {
         this.sendMessage(conversationId, { 
             command: 'fetch_messages', 
             conversation_id: conversationId,
+        });
+    }
+
+    fetchFriends(username) {
+        this.sendMessage(0, {
+            command: 'fetch_all_friends',
+            username: username,
         });
     }
 
@@ -97,6 +110,13 @@ class WebSocketService {
         });
     }
 
+    fetchUserInfo(username) {
+        this.sendMessage(0, {
+            command: 'fetch_user_info',
+            username: username,
+        });
+    }
+
     addCallbacks(callbackOfCommand) {
         Object.keys(callbackOfCommand).forEach((command) => {
             this.callbacks[command] = callbackOfCommand[command];
@@ -120,7 +140,7 @@ class WebSocketService {
         const socket = this.socketRef[conversationId];
         setTimeout(() => {
             if (socket.readyState === 1) {
-                console.log("Connection is made")
+                //console.log("Connection is made")
                 if (callback) {
                     callback();
                 }

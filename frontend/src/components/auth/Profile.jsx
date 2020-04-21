@@ -1,12 +1,12 @@
 import React from 'react';
 
-export default function Profile({ currentUser }) {
+export default function Profile({ userInfo={} }) {
     const infos = [
-        { name: "username", fullname: "Username", type: "text", icon: "icon-user", initialValue: currentUser },
-        { name: "location", fullname: "Location", type: "text", icon: "icon-edit-1", initialValue: "Ha Noi, Vietnam" },
-        { name: "status", fullname: "Status", type: "text", icon: "icon-message-square", initialValue: "I am a developer." },
-        { name: "emailid", fullname: "Email ID", type: "email", icon: "icon-mail", initialValue: "demo@example.com"},
-        { name: "password", fullname: "Password", type: "password", icon: "icon-lock", initialValue: "********"}
+        { name: "username", fullname: "Username", type: "text", icon: "icon-user", value: userInfo.username, readOnly: true },
+        { name: "location", fullname: "Location", type: "text", icon: "icon-edit-1", value: userInfo.location, readOnly: false },
+        { name: "status", fullname: "Status", type: "text", icon: "icon-message-square", value: userInfo.quote, readOnly: false },
+        { name: "emailid", fullname: "Email ID", type: "email", icon: "icon-mail", value: userInfo.email, readOnly: true },
+        { name: "password", fullname: "Password", type: "password", icon: "icon-lock", value: "********", readOnly: false }
     ];
 
     let getProfile = () => {
@@ -19,14 +19,17 @@ export default function Profile({ currentUser }) {
                         <input 
                             type={info.type}
                             className="form-control"
-                            value={ info.initialValue }
+                            defaultValue={ info.value }
+                            readOnly={ info.readOnly }
                             aria-label={ info.initialValue }
                             aria-describedby={ "button-addon-group-" + info.name }
-                            onChange={(e) => {e.preventDefault();}}
                         />
-                        <div className="input-group-append">
-                            <button className="btn btn-link" type="button" id={ "button-addon-group-" + info.name }>Update</button>
-                        </div>
+                        {
+                            info.readOnly? undefined:
+                            <div className="input-group-append">
+                                <button className="btn btn-link" type="button" id={ "button-addon-group-" + info.name }>Update</button>
+                            </div>
+                        }
                     </div>
                 </div>
             </li>

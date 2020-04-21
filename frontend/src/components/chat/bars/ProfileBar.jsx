@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Profile from '../../auth/Profile.jsx';
 
-export default function ProfileBar({ currentUser }) {
+export default function ProfileBar({ userInfo }) {
     return (
         <div className="chat-profilebar">
             <div className="chat-left-headbar">
@@ -25,11 +25,11 @@ export default function ProfileBar({ currentUser }) {
                         <i className="feather icon-camera upload-button"></i>
                         <input className="profile-upload" type="file" accept="image/*"/>
                     </div>
-                    <h5>{ currentUser }</h5>
+                    <h5>{ userInfo? userInfo.getFullName(): "" }</h5>
                     <p className="mb-0">Ha Noi, Vietnam</p>
                 </div>
                 <div className="profile-detail">
-                    <Profile currentUser={currentUser}/>
+                    <Profile userInfo={userInfo}/>
                 </div>
             </div>
         </div>

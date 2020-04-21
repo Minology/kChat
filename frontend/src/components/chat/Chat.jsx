@@ -11,12 +11,14 @@ import ChatListBar from './bars/ChatListBar.jsx';
 import NewChatBar from './bars/NewChatBar.jsx';
 import ProfileBar from './bars/ProfileBar.jsx';
 import SettingBar from './bars/SettingBar.jsx';
+import UserInfo from '../../UserInfo.js';
 import WebSocketInstance from '../../services/WebSocket.js';
 
 export default function Chat({ client, currentUser, conversationList,  setConversationList}) {
     const [lastMessage, setLastMessage] = useState({});
     const [errored, setErrored] = useState(false);
     const [tab, setTab] = useState("chat");
+    const [userInfo, setUserInfo] = useState();
 
     let handleResponse = (response) => {
         let results = [];
@@ -45,7 +47,31 @@ export default function Chat({ client, currentUser, conversationList,  setConver
             .catch(handleError);
     }
 
-    useEffect(fetchConversationList, []);
+    let fetchUserInfo = () => {
+        WebSocketInstance.connect();
+
+        WebSocketInstance.waitForSocketConnection(0, 100, () => {
+            WebSocketInstance.addCallbacks({
+                'fetch_user_info': (response) => {
+                    setUserInfo(new UserInfo(
+                        response.user_id,
+                        response.username,
+                        response.first_name,
+                        response.last_name,
+                        response.email,
+                        response.quote,
+                        response.place
+                    ));
+                },
+            });
+            WebSocketInstance.fetchUserInfo(currentUser);
+        });
+    }
+
+    useEffect(() => {
+        fetchConversationList();
+        fetchUserInfo();
+    }, []);
 
     let updateLastMessage = (message, isSeen) => {
         let newLastMessage = JSON.parse(JSON.stringify(lastMessage));
@@ -69,7 +95,7 @@ export default function Chat({ client, currentUser, conversationList,  setConver
             {
                 tab == "chat"? <ChatListBar conversations={conversationList} lastMessage={lastMessage}/>
                 : tab == "addchat"? <NewChatBar/>
-                : tab == "profile"? <ProfileBar currentUser={currentUser}/>
+                : tab == "profile"? <ProfileBar userInfo={userInfo}/>
                 : tab == "setting"? <SettingBar/>
                 : <h4>Oops! An error occurred.</h4>
             }
