@@ -7,11 +7,9 @@ from rest_framework.generics import (
     DestroyAPIView,
     UpdateAPIView
 )
-from chat.models import Conversation, Participant, Message
+from chat.models import Conversation, Participant, Message, User
 from chat.views import get_user, get_conversation
 from .serializers import ConversationSerializer, MessageSerializer
-
-User = get_user_model()
 
 
 class ConversationListView(ListAPIView):

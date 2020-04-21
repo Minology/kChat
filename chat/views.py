@@ -2,10 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404
 from django.utils.safestring import mark_safe
-from .models import Message, Conversation, AttachmentType, Participant
+from .models import Message, Conversation, AttachmentType, Participant, User
 import json
-
-User = get_user_model()
 
 
 def get_last_10_messages(conversation_id):

@@ -38,13 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
-    'channels',
     'chat',
-    'corsheaders',
+    'channels',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-
     'logAPI',
     'rest_auth',
     'rest_auth.registration',
@@ -204,4 +202,4 @@ REST_FRAMEWORK = {
     )
 }
 
-AUTH_USER_MODEL = 'auth.user'
+AUTH_USER_MODEL = 'chat.user'
