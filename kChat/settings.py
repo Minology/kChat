@@ -41,6 +41,17 @@ INSTALLED_APPS = [
     'channels',
     'chat',
     'corsheaders',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+
+    'logAPI',
+    'rest_auth',
+    'rest_auth.registration',
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +145,63 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+
+# Rest auth settings
+OLD_PASSWORD_FIELD_ENABLED = True
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'logAPI.serializers.RegisterSerializer'
+}
+
+
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'logAPI.serializers.LoginSerializer',
+}
+
+# Email backend settings
+REST_SESSION_LOGIN = True
+DEFAULT_FROM_EMAIL = 'quocanuetcs@gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'quocanuetcs@gmail.com'
+EMAIL_HOST_PASSWORD = 'Quocan16@'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_USER_EMAIL_FIELD = 'email'
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+LOGIN_REDIRECT_URL = '/'
+
+# OAuth settings
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'VERIFIED_EMAIL': True,
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+    },
+}
+
+# Rest Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
+
+AUTH_USER_MODEL = 'auth.user'

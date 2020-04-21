@@ -6,7 +6,6 @@ from django.dispatch import receiver
 
 User = get_user_model()
 
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     quote = models.TextField(default='', max_length=50)
