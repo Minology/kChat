@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  channel:
+    image: redis:5
+    ports:
+     - "6379:6379"
+
+  web:
+    build: .
+    command: bash -c "bash rm-cr.sh && bash scripts/start-web.sh"
+    volumes:
+      - .:/home/kchat
+    ports:
+      - "8000:8000"
+    depends_on:
+      - channel
+      
+volumes:
+  db_data:
