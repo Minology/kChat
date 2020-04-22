@@ -5,19 +5,26 @@ import {
     Redirect,
     useRouteMatch
 } from 'react-router-dom';
+import ModalContainer from './modals/ModalContainer.jsx';
+import NewConversationModal from './modals/NewConversationModal.jsx';
+import AddFriendModal from './modals/AddFriendModal.jsx';
+import FriendRequestModal from './modals/FriendRequestModal.jsx';
 import Conversation from './conversation/Conversation.jsx';
 import ChatMenu from './ChatMenu.jsx';
-import ChatListBar from './bars/ChatListBar.jsx';
-import NewChatBar from './bars/NewChatBar.jsx';
+import ChatBar from './bars/ChatBar.jsx';
+import FriendRequestBar from './bars/FriendRequestBar.jsx';
 import ProfileBar from './bars/ProfileBar.jsx';
 import SettingBar from './bars/SettingBar.jsx';
 import UserInfo from '../../UserInfo.js';
 import WebSocketInstance from '../../services/WebSocket.js';
 
-export default function Chat({ client, currentUser, conversationList,  setConversationList}) {
+export default function Chat({ client, currentUser }) {
+    const [tab, setTab] = useState("chat");
+    const [conversationList, setConversationList] = useState([]);
     const [lastMessage, setLastMessage] = useState({});
     const [errored, setErrored] = useState(false);
-    const [tab, setTab] = useState("chat");
+    const [friendRequestList, setFriendRequestList] = useState([]);
+    const [selectingFriendRequest, setSelectingFriendRequest] = useState();
     const [userInfo, setUserInfo] = useState();
 
     let handleResponse = (response) => {
@@ -47,6 +54,27 @@ export default function Chat({ client, currentUser, conversationList,  setConver
             .catch(handleError);
     }
 
+    let fetchFriendRequests = () => {
+        WebSocketInstance.connect();
+
+        WebSocketInstance.waitForSocketConnection(0, 100, () => {
+            WebSocketInstance.addCallbacks({
+                'fetch_friend_requests_of_user': (friendRequests) => {
+                    let newFriendRequestList = [];
+                    
+                    friendRequests.forEach(friendRequest => {
+                        newFriendRequestList = newFriendRequestList.concat({
+                            fromUser: friendRequest.from_user
+                        });
+                    });
+
+                    setFriendRequestList(newFriendRequestList);
+                },
+            });
+            WebSocketInstance.fetchFriendRequests(currentUser);
+        });
+    }
+
     let fetchUserInfo = () => {
         WebSocketInstance.connect();
 
@@ -70,6 +98,7 @@ export default function Chat({ client, currentUser, conversationList,  setConver
 
     useEffect(() => {
         fetchConversationList();
+        fetchFriendRequests();
         fetchUserInfo();
     }, []);
 
@@ -85,6 +114,33 @@ export default function Chat({ client, currentUser, conversationList,  setConver
         };
         setLastMessage(newLastMessage);
     }
+    
+    let getModals = () => {
+        return  tab == "chat"?
+            <ModalContainer modalName="createGroup" fullname="Create Group">
+                <NewConversationModal 
+                    currentUser={currentUser}
+                    conversationList={conversationList}
+                    setConversationList={setConversationList}
+                />
+            </ModalContainer>
+            : tab == "friends"? (
+                <div>
+                    <ModalContainer modalName="addFriend" fullname="Add Friend">
+                        <AddFriendModal currentUser={currentUser}/>
+                    </ModalContainer>
+                    <ModalContainer modalName="friendRequest" fullname={"Friend Request From " + selectingFriendRequest}>
+                    <FriendRequestModal
+                        currentUser={currentUser}
+                        fromUser={selectingFriendRequest}
+                        friendRequestList={friendRequestList}
+                        setFriendRequestList={setFriendRequestList}
+                    />
+            </ModalContainer>
+                </div>
+            )
+            : undefined
+    }
 
     let getBar = () => {
         return <div
@@ -93,8 +149,9 @@ export default function Chat({ client, currentUser, conversationList,  setConver
             role="tabpanel"
             aria-labelledby={"pills-" + tab + "-tab-justified"}>
             {
-                tab == "chat"? <ChatListBar conversations={conversationList} lastMessage={lastMessage}/>
-                : tab == "addchat"? <NewChatBar/>
+                tab == "chat"? <ChatBar conversations={conversationList} lastMessage={lastMessage}/>
+                : tab == "friends"? 
+                    <FriendRequestBar friendRequests={friendRequestList} setSelectingFriendRequest={setSelectingFriendRequest}/>
                 : tab == "profile"? <ProfileBar userInfo={userInfo}/>
                 : tab == "setting"? <SettingBar/>
                 : <h4>Oops! An error occurred.</h4>
@@ -113,6 +170,7 @@ export default function Chat({ client, currentUser, conversationList,  setConver
 
     return (
         <div className="chat-layout">
+            { getModals() }
             <div className="chat-leftbar">
                 <div className="tab-content" id="pills-tab-justifiedContent">
                     { getBar() }

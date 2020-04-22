@@ -34,7 +34,7 @@ export default class NewConversationModal extends React.Component {
                 friend.last_name,
                 friend.email,
                 friend.quote,
-                friend.place
+                undefined
             );
         });
 
@@ -127,7 +127,7 @@ export default class NewConversationModal extends React.Component {
                         />
                     </div>
                     <div className="form-group">
-                        <textarea className="form-control" name="groupDesc" id="groupDesc" rows="3" placeholder="Enter Group Description"></textarea>
+                        <textarea className="form-control" name="groupDesc" id="groupDescCreateGroup" rows="3" placeholder="Enter Group Description"></textarea>
                     </div>
                     <p className="create-group-header">Add Users</p>
                     <div className="added-users">
@@ -141,7 +141,8 @@ export default class NewConversationModal extends React.Component {
                     </div>
                     <div className="mt-3 text-center">
                         <button type="submit" className="btn btn-primary">
-                            <i className="feather icon-plus mr-2"></i>Create Group
+                            <i className="feather icon-plus mr-2"></i>
+                            Create Group
                         </button>
                     </div>
                     <div ref="hiddenButton" data-dismiss="modal"></div>

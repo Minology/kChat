@@ -50,6 +50,18 @@ class WebSocketService {
         if (command === 'new_message') {
             this.callbacks[command](parsedData.message);
         }
+        if (command == 'fetch_not_friends') {
+            this.callbacks[command](parsedData.strangers);
+        }
+        if (command == 'fetch_friend_requests_of_user') {
+            this.callbacks[command](parsedData.requests);
+        }
+        if (command == 'accept_friend_request') {
+            this.callbacks[command](true);
+        }
+        if (command == 'decline_friend_request') {
+            this.callbacks[command](parsedData.log == 'Decline friend request successful');
+        }
         if (command == 'fetch_all_friends') {
             this.callbacks[command](parsedData.friends);
         }
@@ -74,6 +86,44 @@ class WebSocketService {
         this.sendMessage(conversationId, { 
             command: 'fetch_messages', 
             conversation_id: conversationId,
+        });
+    }
+
+    fetchNotFriends(username) {
+        this.sendMessage(0, {
+            command: 'fetch_not_friends',
+            username: username,
+        });
+    }
+
+    sendFriendRequest(fromUsername, toUsername) {
+        this.sendMessage(0, {
+            command: 'send_friend_request',
+            from_username: fromUsername,
+            to_username: toUsername
+        });
+    }
+    
+    fetchFriendRequests(username) {
+        this.sendMessage(0, {
+            command: 'fetch_friend_requests_of_user',
+            to_username: username,
+        });
+    }
+
+    acceptFriendRequest(fromUsername, toUsername) {
+        this.sendMessage(0, {
+            command: 'accept_friend_request',
+            from_username: fromUsername,
+            to_username: toUsername,
+        });
+    }
+
+    declineFriendRequest(fromUsername, toUsername) {
+        this.sendMessage(0, {
+            command: 'decline_friend_request',
+            from_username: fromUsername,
+            to_username: toUsername,
         });
     }
 

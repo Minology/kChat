@@ -11,7 +11,7 @@ export default function ChatSearch() {
                     aria-label="Search"
                     aria-describedby="chat-left-search-btn"/>
                 <div className="input-group-append">
-                    <button className="btn" type="submit" id="chat-left-search-btn">
+                    <button className="btn" type="submit">
                         <i className="feather icon-search"></i>
                     </button>
                 </div>

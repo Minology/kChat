@@ -28732,6 +28732,85 @@ mark {
   color: #4c595f;
 }
 
+.add-friend-modal .modal-body .add-friend-header {
+  padding: 15px;
+  margin-bottom: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.add-friend-modal .modal-body .added-users {
+  padding: 15px;
+}
+.add-friend-modal .modal-body .add-friend-list ul {
+  margin-bottom: 0;
+}
+.add-friend-modal .modal-body .add-friend-list ul li {
+  padding: 15px 0;
+  border-left: 2px solid transparent;
+}
+.add-friend-modal .modal-body .add-friend-list ul li img {
+  width: 40px;
+  margin-right: 10px;
+}
+.add-friend-modal .modal-body .add-friend-list ul li h5 {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+.add-friend-modal .modal-body .add-friend-list ul li p {
+  margin-bottom: 0;
+}
+.add-friend-modal .modal-body .add-friend-list ul li .custom-control-input {
+  position: relative;
+}
+.add-friend-modal .modal-body .add-friend-list ul li .custom-control-label {
+  vertical-align: middle;
+}
+.add-friend-modal .modal-body .add-friend-list ul li .custom-control-label:before {
+  left: -20px;
+}
+.add-friend-modal .modal-body .add-friend-list ul li .custom-control-label:after {
+  left: -20px;
+}
+.add-friend-modal .modal-body .btn {
+  font-size: 16px;
+  padding: 6px 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.add-friend-modal .modal-body .avatar-group {
+  display: inline-flex;
+}
+.add-friend-modal .modal-body .avatar-group .avatar {
+  position: relative;
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  font-size: 1rem;
+  margin-left: -0.8rem;
+  transition: transform 0.2s;
+}
+.add-friend-modal .modal-body .avatar-group .avatar img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
+  border: 2px solid #262B2E;
+  background-color: #262B2E;
+}
+.add-friend-modal .modal-body .avatar-group .avatar:hover {
+  -webkit-mask-image: none;
+  mask-image: none;
+  z-index: 1;
+  transform: scale(1.1);
+}
+.add-friend-modal .modal-body .add-users-search .input-group-append {
+  margin-left: 0;
+}
+.add-friend-modal .modal-body .add-users-search .input-group-append .btn {
+  background-color: rgba(129, 167, 205, 0.1);
+  padding: 4px 12px;
+  color: #4c595f;
+}
+
 ::-webkit-scrollbar {
   width: 0;
 }

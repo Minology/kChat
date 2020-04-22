@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import {
+    Link
+} from 'react-router-dom';
 import Profile from '../../auth/Profile.jsx';
 
 export default function ProfileBar({ userInfo }) {
@@ -6,7 +9,7 @@ export default function ProfileBar({ userInfo }) {
         <div className="chat-profilebar">
             <div className="chat-left-headbar">
                 <div className="row align-items-center">
-                    <div className="col-12">
+                    <div className="col-9">
                         <ul className="list-unstyled mb-0">
                             <li className="media">
                                 <img className="align-self-center mr-2" src="../../../../public/assets/images/logo.svg" alt="Generic placeholder image"/>
@@ -15,6 +18,11 @@ export default function ProfileBar({ userInfo }) {
                                 </div>
                             </li>
                         </ul>
+                    </div>
+                    <div className="col-3">
+                        <Link to="/login" data-toggle="tooltip" data-placement="right" title="" data-original-title="Logout">
+                            <i className="feather icon-log-out"></i>
+                        </Link>
                     </div>
                 </div>
             </div>

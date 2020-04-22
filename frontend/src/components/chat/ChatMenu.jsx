@@ -3,7 +3,7 @@ import React from 'react';
 export default function ChatMenu({ setTab }) {
     const tabs = [
         { name: "chat", icon: "icon-message-circle" },
-        { name: "addchat", icon: "icon-edit-1" },
+        { name: "friends", icon: "icon-users" },
         { name: "profile", icon: "icon-user" },
         { name: "setting", icon: "icon-settings" }
     ];
