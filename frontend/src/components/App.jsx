@@ -1,13 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
     Switch,
     Route
 } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute.jsx';
-import HomePage from './pages/HomePage.jsx';
-import LoginPage from './pages/LoginPage.jsx';
-import ChatPage from './pages/ChatPage.jsx';
-import WebSocketInstance from '../services/WebSocket';
+import Client from '../client.js';
+import NotFoundPage from './NotFoundPage.jsx';
+import HomePage from './home/HomePage.jsx';
+import LoginPage from './auth/LoginPage.jsx';
+import ChatPage from './chat/ChatPage.jsx';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -26,7 +28,6 @@ export default class App extends React.Component {
             username: username,
             isAuthenticated: true 
         });
-        //WebSocketInstance.connect();
         cb();
     }
 
@@ -46,13 +47,17 @@ export default class App extends React.Component {
                         <LoginPage authenticate={this.authenticate} />
                     </Route>
                     <PrivateRoute authed={isAuthenticated} path="/chat">
-                        <ChatPage currentUser={username} />
+                        <ChatPage client={this.props.client} currentUser={username} />
                     </PrivateRoute>
                     <Route>
-                        <h1>404 Not found</h1>
+                        <NotFoundPage />
                     </Route>
                 </Switch>
             </div>
         );
     }
+}
+
+App.propTypes = {
+	client: PropTypes.instanceOf(Client)
 }

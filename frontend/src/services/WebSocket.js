@@ -12,28 +12,29 @@ class WebSocketService {
     }
 
     constructor() {
-        this.socketRef = null;
+        this.socketRef = {};
     }
 
-    connect() {
-        const path = config.API_PATH;
-        this.socketRef = new WebSocket(path);
+    connect(conversationId=0) {
+        if (this.socketRef[conversationId]) return;
 
-        this.socketRef.onopen = () => {
-            console.log('WebSocket open');
+        const path = config.API_PATH + conversationId + '/';
+        this.socketRef[conversationId] = new ReconnectingWebSocket(path, null, {debug: true});
+
+        this.socketRef[conversationId].onopen = () => {
+            console.log('WebSocket at ' + conversationId + ' open');
         };
 
-        this.socketRef.onmessage = e => {
+        this.socketRef[conversationId].onmessage = e => {
             this.socketNewMessage(e.data);
         };
 
-        this.socketRef.onerror = e => {
+        this.socketRef[conversationId].onerror = e => {
             console.log(e.message);
         };
 
-        this.socketRef.onclose = () => {
-            console.log("WebSocket closed let's reopen");
-            this.connect();
+        this.socketRef[conversationId].onclose = () => {
+            console.log("WebSocket closed at " + conversationId + " let's reopen");
         };
     }
 
@@ -49,55 +50,157 @@ class WebSocketService {
         if (command === 'new_message') {
             this.callbacks[command](parsedData.message);
         }
+        if (command == 'fetch_not_friends') {
+            this.callbacks[command](parsedData.strangers);
+        }
+        if (command == 'fetch_friend_requests_of_user') {
+            this.callbacks[command](parsedData.requests);
+        }
+        if (command == 'accept_friend_request') {
+            this.callbacks[command](true);
+        }
+        if (command == 'decline_friend_request') {
+            this.callbacks[command](parsedData.log == 'Decline friend request successful');
+        }
+        if (command == 'fetch_all_friends') {
+            this.callbacks[command](parsedData.friends);
+        }
+        if (command == 'create_conversation') {
+            this.callbacks[command]({
+                successful: parsedData.log == 'successful',
+                conversation: parsedData.conversation,
+            });
+        }
+        if (command == 'add_user_to_conversation') {
+            this.callbacks[command]({
+                successful: parsedData.log == 'successful',
+                username: parsedData.user.username,
+            });
+        }
+        if (command == 'fetch_user_info') {
+            this.callbacks[command](parsedData.user);
+        }
     }
 
-    initChatUser(username) {
-        this.sendMessage({ command: 'init_chat', username: username });
+    fetchMessages(conversationId) {
+        this.sendMessage(conversationId, { 
+            command: 'fetch_messages', 
+            conversation_id: conversationId,
+        });
     }
 
-    fetchMessages(username) {
-        this.sendMessage({ command: 'fetch_messages', username: username });
+    fetchNotFriends(username) {
+        this.sendMessage(0, {
+            command: 'fetch_not_friends',
+            username: username,
+        });
+    }
+
+    sendFriendRequest(fromUsername, toUsername) {
+        this.sendMessage(0, {
+            command: 'send_friend_request',
+            from_username: fromUsername,
+            to_username: toUsername
+        });
+    }
+    
+    fetchFriendRequests(username) {
+        this.sendMessage(0, {
+            command: 'fetch_friend_requests_of_user',
+            to_username: username,
+        });
+    }
+
+    acceptFriendRequest(fromUsername, toUsername) {
+        this.sendMessage(0, {
+            command: 'accept_friend_request',
+            from_username: fromUsername,
+            to_username: toUsername,
+        });
+    }
+
+    declineFriendRequest(fromUsername, toUsername) {
+        this.sendMessage(0, {
+            command: 'decline_friend_request',
+            from_username: fromUsername,
+            to_username: toUsername,
+        });
+    }
+
+    fetchFriends(username) {
+        this.sendMessage(0, {
+            command: 'fetch_all_friends',
+            username: username,
+        });
     }
 
     newChatMessage(message) {
-        this.sendMessage({ command: 'new_message', from: message.from, text: message.text }); 
+        this.sendMessage(message.conversationId, { 
+            command: 'new_message', 
+            from: message.from,
+            conversation_id: message.conversationId,
+            attachment_type: message.attachmentType,
+            message: message.content,
+        }); 
     }
 
-    addCallbacks(messagesCallback, newMessageCallback) {
-        this.callbacks['messages'] = messagesCallback;
-        this.callbacks['new_message'] = newMessageCallback;
+    newConversation(conversationName, creator) {
+        this.sendMessage(0, {
+            command: 'create_conversation',
+            conversation_name: conversationName,
+            username: creator,
+        });
+    }
+
+    addUserToConversation(conversationId, username) {
+        this.sendMessage(conversationId, {
+            command: 'add_user_to_conversation',
+            conversation_id: conversationId,
+            username: username,
+        });
+    }
+
+    fetchUserInfo(username) {
+        this.sendMessage(0, {
+            command: 'fetch_user_info',
+            username: username,
+        });
+    }
+
+    addCallbacks(callbackOfCommand) {
+        Object.keys(callbackOfCommand).forEach((command) => {
+            this.callbacks[command] = callbackOfCommand[command];
+        });
     }
   
-    sendMessage(data) {
+    sendMessage(conversationId, data) {
         try {
-            this.socketRef.send(JSON.stringify({ ...data }));
+            this.socketRef[conversationId].send(JSON.stringify({ ...data }));
         }
         catch(err) {
             console.log(err.message);
         }  
     }
 
-    state() {
-        return this.socketRef.readyState;
+    state(conversationId) {
+        return this.socketRef[conversationId].readyState;
     }
 
-    waitForSocketConnection(callback){
-        const socket = this.socketRef;
-        const recursion = this.waitForSocketConnection;
+    waitForSocketConnection = (conversationId=0, timeout=5, callback) => {
+        const socket = this.socketRef[conversationId];
         setTimeout(() => {
             if (socket.readyState === 1) {
-                console.log("Connection is made")
-                if (callback != null) {
+                //console.log("Connection is made")
+                if (callback) {
                     callback();
                 }
                 return;
             } else {
                 console.log("wait for connection...")
-                recursion(callback);
+                this.waitForSocketConnection(conversationId, timeout, callback);
             }
-        }, 1); // wait 5 milisecond for the connection...
+        }, timeout); // wait 5 milisecond for the connection...
     }
-
 }
 
 const WebSocketInstance = WebSocketService.getInstance();
