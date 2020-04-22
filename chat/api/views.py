@@ -5,11 +5,11 @@ from rest_framework.generics import (
     RetrieveAPIView,
     CreateAPIView,
     DestroyAPIView,
-    UpdateAPIView
+    RetrieveUpdateAPIView,
 )
-from chat.models import Conversation, Participant, Message, User
+from chat.models import Conversation, Participant, Message, User, AttachmentType, Connection, FriendRequest
 from chat.views import get_user, get_conversation
-from .serializers import ConversationSerializer, MessageSerializer
+from .serializers import ConversationSerializer, MessageSerializer, UserSerializer, AttachmentTypeSerializer, ParticipantSerializer,ConnectionSerializer, FriendRequestSerializer
 
 
 class ConversationListView(ListAPIView):
@@ -40,7 +40,7 @@ class ConversationCreateView(CreateAPIView):
     permission_classes = (permissions.IsAuthenticated, )
 
 
-class ConversationUpdateView(UpdateAPIView):
+class ConversationUpdateView(RetrieveUpdateAPIView):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
     permission_classes = (permissions.IsAuthenticated, )
@@ -77,7 +77,7 @@ class MessageCreateView(CreateAPIView):
     permission_classes = (permissions.IsAuthenticated, )
 
 
-class MessageUpdateView(UpdateAPIView):
+class MessageUpdateView(RetrieveUpdateAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = (permissions.IsAuthenticated, )
@@ -87,3 +87,55 @@ class MessageDeleteView(DestroyAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = (permissions.IsAuthenticated, )
+
+
+class UserListView(ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (permissions.AllowAny, )
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        username = self.request.query_params.get('username', None)
+        if username is not None:
+            queryset = User.objects.filter(username=username)
+        return queryset
+
+
+class UserDetailView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (permissions.AllowAny, )
+
+
+class UserUpdateView(RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+
+class AttachmentTypeListView(ListAPIView):
+    queryset = AttachmentType.objects.all()
+    serializer_class = AttachmentTypeSerializer
+    permission_classes = (permissions.AllowAny, )
+
+
+class ParticipantListView(ListAPIView):
+    queryset = Participant.objects.all()
+    serializer_class = ParticipantSerializer
+    permission_classes = (permissions.AllowAny, )
+
+
+class ConnectionListView(ListAPIView):
+    queryset = Connection.objects.all()
+    serializer_class = ConnectionSerializer
+    permission_classes = (permissions.AllowAny, )   
+
+
+class FriendRequestListView(ListAPIView):
+    queryset = FriendRequest.objects.all()
+    serializer_class = FriendRequestSerializer
+    permission_classes = (permissions.AllowAny, )       
+
+
+
+
