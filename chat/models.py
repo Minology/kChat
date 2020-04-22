@@ -50,6 +50,8 @@ class Conversation(models.Model):
     deleted_at = models.DateTimeField(blank=True, null=True)
     title = models.CharField(max_length=40)
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name = 'conversations')
+    message_count = models.IntegerField(default=0)
+    last_message_id = models.IntegerField(blank=True,null=True)
 
     def __str__(self):
         return self.title
@@ -73,6 +75,7 @@ class Message(models.Model):
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='messages')
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name = 'messages')
     attachment_type = models.ForeignKey(AttachmentType, on_delete=models.CASCADE, related_name = 'messages')
+    order_in_conversation = models.IntegerField()
 
 
 class Participant(models.Model):
@@ -108,6 +111,7 @@ class FriendRequest(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     from_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     to_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='friend_requests')
+    request_message = models.TextField(blank=True,null=True)
 
     class Meta:
         unique_together = ('from_user', 'to_user')

@@ -10,7 +10,14 @@ from .views import (
     MessageDetailView,
     MessageCreateView,
     MessageUpdateView,
-    MessageDeleteView
+    MessageDeleteView,
+    UserListView,
+    UserDetailView,
+    UserUpdateView,
+    AttachmentTypeListView,
+    ParticipantListView,
+    ConnectionListView,
+    FriendRequestListView,
 )
 
 app_name = 'chat'
@@ -26,4 +33,11 @@ urlpatterns = [
     path('message/<pk>/', MessageDetailView.as_view()),
     path('message/<pk>/update/', MessageUpdateView.as_view()),
     path('message/<pk>/delete/', MessageDeleteView.as_view()),
+    path('user/', UserListView.as_view()),
+    path('user/<pk>/', UserDetailView.as_view()),
+    path('user/<pk>/update/', UserUpdateView.as_view()),
+    path('attach_type/', AttachmentTypeListView.as_view()),
+    path('participant/', ParticipantListView.as_view()),
+    path('connection/', ConnectionListView.as_view()),
+    path('fr_req/', FriendRequestListView.as_view()),
 ]

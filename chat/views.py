@@ -23,9 +23,6 @@ def get_conversation(conversation_id):
 def get_attachment_type(attachment_type):
     return get_object_or_404(AttachmentType, name=attachment_type)
 
-def index(request):
-    return render(request, 'chat/index.html', {})
-
 @login_required
 def room(request, room_name):
     return render(request, 'chat/room.html', {
