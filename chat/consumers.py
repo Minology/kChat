@@ -57,8 +57,8 @@ class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
-        user = self.scope['user']
-        if user.is_anonymous:
+        self.user = self.scope['user']
+        if self.user.is_anonymous:
             self.close()
         else:
             async_to_sync(self.channel_layer.group_add)(
