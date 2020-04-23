@@ -13,10 +13,10 @@ class TokenAuthMiddleware:
 
     def __call__(self, scope):
         headers = dict(scope["headers"])
-        if "X-Auth-Token" in headers[b"cookie"]:
+        if b"X-Auth-Token" in headers[b"cookie"]:
             try:
                 cookies = headers[b"cookie"].decode()
-                token_key = re.search("X-Auth-Token=(.*)(; )?", cookies).group(1)
+                token_key = re.search(b"X-Auth-Token=(.*)(; )?", cookies).group(1)
                 if token_key:
                     token = Token.objects.get(key=token_key)
                     scope["user"] = token.user
