@@ -26,6 +26,10 @@ class Client {
         }
     }
 
+    async getUserInfo() {
+        return await this._get('accounts/user');
+    }
+
     async getConversationList(username) {
         const params = {
             username: username,

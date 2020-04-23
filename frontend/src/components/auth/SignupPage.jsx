@@ -123,7 +123,7 @@ export default function SignupPage() {
                         <div className="form-row mb-3">
                             <div className="col-sm-12">
                                 <Checkbox
-                                    name={"I Agree to Terms & Conditions of Gappa"}
+                                    name={"I Agree to Terms & Conditions"}
                                     showName={true}
                                     style="custom-checkbox text-left"
                                     checked={didAgree}

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {
     Switch,
     Route
@@ -17,24 +16,25 @@ export default class App extends React.Component {
         super(props);
 
         this.state = {
-            username: '',
             isAuthenticated: true
         };
-
-        this.authenticate = this.authenticate.bind(this);
     }
 
-    authenticate(username, cb) {
+    authenticate = (callback) => {
         this.setState({ 
-            username: username,
             isAuthenticated: true 
         });
-        cb();
+        callback();
+    }
+
+    unauthenticate = () => {
+        this.setState({
+            isAuthenticated: false
+        });
     }
 
     render() {
         const {
-            username,
             isAuthenticated
         } = this.state;
 
@@ -54,7 +54,7 @@ export default class App extends React.Component {
                         <ForgotPasswordPage/>
                     </Route>
                     <PrivateRoute authed={isAuthenticated} path="/chat">
-                        <ChatPage currentUser={username} />
+                        <ChatPage unauthenticate={this.unauthenticate} />
                     </PrivateRoute>
                     <Route>
                         <NotFoundPage />

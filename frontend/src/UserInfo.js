@@ -1,5 +1,5 @@
 export default class UserInfo {
-    constructor(id, username, firstName, lastName, email, quote, location) {
+    constructor(id, username, firstName, lastName, email, quote, location, avatar) {
         this.id = id;
         this.username = username;
         this.firstName = firstName;
@@ -7,6 +7,7 @@ export default class UserInfo {
         this.email = email;
         this.quote = quote;
         this.location = location;
+        this.avatar = avatar;
     }
 
     getFullName = () => {

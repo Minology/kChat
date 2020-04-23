@@ -21,7 +21,7 @@ export default function LoginPage({ authenticate }) {
             AxiosInstance.defaults.headers['Authorization'] = "JWT " + response.data.key;
             localStorage.setItem('refresh_token', response.data.key);
         }
-        authenticate('newl', () => {
+        authenticate(() => {
             setRedirectToReferer(true);
         });
     }

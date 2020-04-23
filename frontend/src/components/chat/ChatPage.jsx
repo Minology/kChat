@@ -6,12 +6,12 @@ import {
 } from 'react-router-dom';
 import Chat from './Chat.jsx';
 
-export default function ChatPage({ client, currentUser }) {
+export default function ChatPage({ unauthenticate }) {
     let match = useRouteMatch();
     return (
         <Switch>
             <Route path={match.path}>
-                <Chat client={client} currentUser={currentUser}/>
+                <Chat unauthenticate={unauthenticate}/>
             </Route>
         </Switch>
     )

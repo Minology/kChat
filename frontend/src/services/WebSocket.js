@@ -31,6 +31,7 @@ class WebSocketService {
 
         this.socketRef[conversationId].onerror = e => {
             console.log(e.message);
+            this.socketRef[conversationId] = null;
         };
 
         this.socketRef[conversationId].onclose = () => {
@@ -188,6 +189,7 @@ class WebSocketService {
 
     waitForSocketConnection = (conversationId=0, timeout=5, callback) => {
         const socket = this.socketRef[conversationId];
+        if (!socket) return;
         setTimeout(() => {
             if (socket.readyState === 1) {
                 //console.log("Connection is made")
@@ -200,6 +202,11 @@ class WebSocketService {
                 this.waitForSocketConnection(conversationId, timeout, callback);
             }
         }, timeout); // wait 5 milisecond for the connection...
+    }
+
+    connectAndWait = (conversationId=0, timeout=5, callback) => {
+        this.connect(conversationId);
+        this.waitForSocketConnection(conversationId, timeout, callback);
     }
 }
 

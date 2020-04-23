@@ -19,46 +19,40 @@ import UserInfo from '../../UserInfo.js';
 import WebSocketInstance from '../../services/WebSocket.js';
 import ClientInstance from '../../Client.js';
 
-export default function Chat({ currentUser }) {
+export default function Chat({ unauthenticate }) {
     const [tab, setTab] = useState("chat");
     const [conversationList, setConversationList] = useState([]);
     const [lastMessage, setLastMessage] = useState({});
     const [errored, setErrored] = useState(false);
     const [friendRequestList, setFriendRequestList] = useState([]);
     const [selectingFriendRequest, setSelectingFriendRequest] = useState();
-    const [userInfo, setUserInfo] = useState();
-
-    let handleResponse = (response) => {
-        let results = [];
-
-        response.data.forEach(conversation => {
-            results = results.concat({
-                id: conversation.id,
-                title: conversation.title,
-                creator: conversation.creator,
-                created_at: conversation.created_at,
-            });
-            WebSocketInstance.connect(conversation.id);
-        });
-
-        setConversationList(results);
-    }
-
-    let handleError = (error) => {
-        setErrored(true);
-        console.log('An error occurred: ' + error);
-    }
+    const [userInfo, setUserInfo] = useState({});
 
     let fetchConversationList = () => {
-        ClientInstance.getConversationList(currentUser)
-            .then(handleResponse)
-            .catch(handleError);
+        ClientInstance.getConversationList(userInfo.username)
+            .then((response) => {
+                let results = [];
+
+                response.data.forEach(conversation => {
+                    results = results.concat({
+                        id: conversation.id,
+                        title: conversation.title,
+                        creator: conversation.creator,
+                        created_at: conversation.created_at,
+                    });
+                    WebSocketInstance.connect(conversation.id);
+                });
+
+                setConversationList(results);
+            })
+            .catch((error) => {
+                console.log('An error occurred: ' + error);
+                setErrored(true);
+            });
     }
 
     let fetchFriendRequests = () => {
-        WebSocketInstance.connect();
-
-        WebSocketInstance.waitForSocketConnection(0, 100, () => {
+        WebSocketInstance.connectAndWait(0, 100, () => {
             WebSocketInstance.addCallbacks({
                 'fetch_friend_requests_of_user': (friendRequests) => {
                     let newFriendRequestList = [];
@@ -72,35 +66,38 @@ export default function Chat({ currentUser }) {
                     setFriendRequestList(newFriendRequestList);
                 },
             });
-            WebSocketInstance.fetchFriendRequests(currentUser);
+            WebSocketInstance.fetchFriendRequests(userInfo.username);
         });
     }
 
-    let fetchUserInfo = () => {
-        WebSocketInstance.connect();
-
-        WebSocketInstance.waitForSocketConnection(0, 100, () => {
-            WebSocketInstance.addCallbacks({
-                'fetch_user_info': (response) => {
-                    setUserInfo(new UserInfo(
-                        response.user_id,
-                        response.username,
-                        response.first_name,
-                        response.last_name,
-                        response.email,
-                        response.quote,
-                        response.place
-                    ));
-                },
-            });
-            WebSocketInstance.fetchUserInfo(currentUser);
-        });
+    let fetchUserInfo = (callback) => {
+        ClientInstance.getUserInfo()
+            .then((response) => {
+                console.log(response.data);
+                setUserInfo(new UserInfo(
+                    undefined,
+                    response.data.username,
+                    response.data.first_name,
+                    response.data.last_name,
+                    response.data.email,
+                    response.data.quote,
+                    response.data.place,
+                    response.data.avatar
+                ));
+                callback();
+            })
+            .catch((error) => {
+                console.error('An error occurred: ' + error);
+                setErrored(true);
+                unauthenticate();
+            })
     }
 
     useEffect(() => {
-        fetchConversationList();
-        fetchFriendRequests();
-        fetchUserInfo();
+        fetchUserInfo(() => {
+            fetchConversationList();
+            fetchFriendRequests();
+        });
     }, []);
 
     let updateLastMessage = (message, isSeen) => {
@@ -120,7 +117,7 @@ export default function Chat({ currentUser }) {
         return  tab == "chat"?
             <ModalContainer modalName="createGroup" fullname="Create Group">
                 <NewConversationModal 
-                    currentUser={currentUser}
+                    currentUser={userInfo.username}
                     conversationList={conversationList}
                     setConversationList={setConversationList}
                 />
@@ -128,11 +125,11 @@ export default function Chat({ currentUser }) {
             : tab == "friends"? (
                 <div>
                     <ModalContainer modalName="addFriend" fullname="Add Friend">
-                        <AddFriendModal currentUser={currentUser}/>
+                        <AddFriendModal currentUser={userInfo.username}/>
                     </ModalContainer>
                     <ModalContainer modalName="friendRequest" fullname={"Friend Request From " + selectingFriendRequest}>
                         <FriendRequestModal
-                            currentUser={currentUser}
+                            currentUser={userInfo.username}
                             fromUser={selectingFriendRequest}
                             friendRequestList={friendRequestList}
                             setFriendRequestList={setFriendRequestList}
@@ -164,7 +161,7 @@ export default function Chat({ currentUser }) {
     let getConversationRoutes = () => {
         return conversationList.map((conversation, i) => (
             <Route key={i} exact path={`${match.path}/${conversation.id}`}>
-                <Conversation currentUser={currentUser} details={conversation} updateLastMessage={updateLastMessage}/>
+                <Conversation currentUser={userInfo.username} details={conversation} updateLastMessage={updateLastMessage}/>
             </Route>
         ));
     }
