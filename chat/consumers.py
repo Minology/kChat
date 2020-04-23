@@ -1,12 +1,15 @@
 import json
+import traceback
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from .models import Message, Conversation, AttachmentType, Participant, Connection, FriendRequest, User
-from .views import get_last_10_messages, get_user, get_conversation, get_attachment_type, get_participant
+from .views import get_last_10_messages, get_user, get_conversation, get_attachment_type, get_participant, get_user_by_email
 
 
 class ChatConsumer(WebsocketConsumer):
     def fetch_messages(self, data):
+        mydata = {"from_username":"abc123", "to_username":"HelloWorld"}
+        self.accept_friend_request(mydata)
         messages = get_last_10_messages(data['conversation_id'])
         json_messages = self.messages_to_json(messages)
         content = {
@@ -82,6 +85,7 @@ class ChatConsumer(WebsocketConsumer):
             content['log'] = 'Command executed successfully'
         except Exception as e:
             content['log'] = str(e.__class__.__name__) + " error : " + str(e.__context__)
+            traceback.print_exc()
         finally:
             self.send_data(content)
             
@@ -150,7 +154,6 @@ class ChatConsumer(WebsocketConsumer):
         content = {
             'command': 'add_user_to_conversation',
             'user': self.user_to_json(user),
-            'log': 'successful'
         }
         return content  
 
@@ -158,7 +161,6 @@ class ChatConsumer(WebsocketConsumer):
         Participant.objects.filter(id=data['participant_id']).delete()
         content = {
             'command': 'remove_user_from_conversation',
-            'log': 'successful'
         }
         return content  
 
@@ -175,7 +177,6 @@ class ChatConsumer(WebsocketConsumer):
         content = {
             'command': 'create_conversation',
             'conversation': self.conversation_to_json(conversation),
-            'log': 'successful'
         }
         return content  
 
@@ -183,7 +184,6 @@ class ChatConsumer(WebsocketConsumer):
         Conversation.objects.filter(id=data['conversation_id']).delete()
         content = {
             'command': 'remove_conversation',
-            'log': 'successful'
         }
         return content  
 
@@ -217,6 +217,14 @@ class ChatConsumer(WebsocketConsumer):
             'users': self.users_to_json(User.objects.all().order_by('username')[:50])
         }
         return content
+
+    def fetch_user_info_by_email(self, data):
+        user = get_user_by_email(data['email'])
+        content = {
+            'command': 'fetch_user_info',
+            'user': self.user_to_json(user)
+        }
+        return content        
 
     def fetch_not_friends(self, data):
         user = get_user(data['username'])
@@ -286,7 +294,6 @@ class ChatConsumer(WebsocketConsumer):
         FriendRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
         content = {
             'command': 'discard_friend_request',
-            'log': 'Discard friend request successful'
         }       
         return content
 
@@ -296,7 +303,6 @@ class ChatConsumer(WebsocketConsumer):
         FriendRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
         content = {
             'command': 'decline_friend_request',
-            'log': 'Decline friend request successful',
         }        
         return content
 
@@ -307,7 +313,6 @@ class ChatConsumer(WebsocketConsumer):
         Connection.objects.filter(from_user=to_user, to_user=from_user).delete()
         content = {
             'command': 'remove_friend',
-            'log': 'Remove friend successful',
         }
         return content
 
@@ -362,7 +367,6 @@ class ChatConsumer(WebsocketConsumer):
             participant.save() 
         content = {
             'command': 'update_last_seen_message',
-            'log': 'Update last seen message successful',
         }
         return content
 
@@ -430,6 +434,7 @@ class ChatConsumer(WebsocketConsumer):
         'search_conversation': search_conversation,
         'search_user': search_user,
         'fetch_user_info': fetch_user_info,
+        'fetch_user_info_by_email': fetch_user_info_by_email,
         'fetch_users_info': fetch_users_info,
         'fetch_not_friends': fetch_not_friends,
         'fetch_all_friends': fetch_all_friends,
