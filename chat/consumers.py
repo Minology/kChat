@@ -8,8 +8,6 @@ from .views import get_last_10_messages, get_user, get_conversation, get_attachm
 
 class ChatConsumer(WebsocketConsumer):
     def fetch_messages(self, data):
-        mydata = {"from_username":"abc123", "to_username":"HelloWorld"}
-        self.accept_friend_request(mydata)
         messages = get_last_10_messages(data['conversation_id'])
         json_messages = self.messages_to_json(messages)
         content = {
@@ -284,7 +282,6 @@ class ChatConsumer(WebsocketConsumer):
         connections.append(Connection.objects.get_or_create(from_user=to_user, to_user=from_user)[0])
         content = {
             'command': 'accept_friend_request',
-            'connections': self.friend_requests_to_json(connections)
         }
         return content
 
