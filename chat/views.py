@@ -17,6 +17,9 @@ def get_participant(user, conversation):
 def get_user(username):
     return get_object_or_404(User, username=username)
 
+def get_user_by_email(email):
+    return get_object_or_404(User, email=email)    
+
 def get_conversation(conversation_id):
     return get_object_or_404(Conversation, pk=conversation_id)
 
