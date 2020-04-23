@@ -17,8 +17,9 @@ import ProfileBar from './bars/ProfileBar.jsx';
 import SettingBar from './bars/SettingBar.jsx';
 import UserInfo from '../../UserInfo.js';
 import WebSocketInstance from '../../services/WebSocket.js';
+import ClientInstance from '../../Client.js';
 
-export default function Chat({ client, currentUser }) {
+export default function Chat({ currentUser }) {
     const [tab, setTab] = useState("chat");
     const [conversationList, setConversationList] = useState([]);
     const [lastMessage, setLastMessage] = useState({});
@@ -30,7 +31,7 @@ export default function Chat({ client, currentUser }) {
     let handleResponse = (response) => {
         let results = [];
 
-        response.forEach(conversation => {
+        response.data.forEach(conversation => {
             results = results.concat({
                 id: conversation.id,
                 title: conversation.title,
@@ -49,7 +50,7 @@ export default function Chat({ client, currentUser }) {
     }
 
     let fetchConversationList = () => {
-        client.getConversationList(currentUser)
+        ClientInstance.getConversationList(currentUser)
             .then(handleResponse)
             .catch(handleError);
     }
@@ -130,13 +131,13 @@ export default function Chat({ client, currentUser }) {
                         <AddFriendModal currentUser={currentUser}/>
                     </ModalContainer>
                     <ModalContainer modalName="friendRequest" fullname={"Friend Request From " + selectingFriendRequest}>
-                    <FriendRequestModal
-                        currentUser={currentUser}
-                        fromUser={selectingFriendRequest}
-                        friendRequestList={friendRequestList}
-                        setFriendRequestList={setFriendRequestList}
-                    />
-            </ModalContainer>
+                        <FriendRequestModal
+                            currentUser={currentUser}
+                            fromUser={selectingFriendRequest}
+                            friendRequestList={friendRequestList}
+                            setFriendRequestList={setFriendRequestList}
+                        />
+                    </ModalContainer>
                 </div>
             )
             : undefined

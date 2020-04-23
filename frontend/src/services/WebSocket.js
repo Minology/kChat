@@ -18,7 +18,7 @@ class WebSocketService {
     connect(conversationId=0) {
         if (this.socketRef[conversationId]) return;
 
-        const path = config.API_PATH + conversationId + '/';
+        const path = config.WS_PATH + conversationId + '/';
         this.socketRef[conversationId] = new ReconnectingWebSocket(path, null, {debug: true});
 
         this.socketRef[conversationId].onopen = () => {

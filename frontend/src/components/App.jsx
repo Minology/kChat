@@ -5,10 +5,11 @@ import {
     Route
 } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute.jsx';
-import Client from '../client.js';
 import NotFoundPage from './NotFoundPage.jsx';
 import HomePage from './home/HomePage.jsx';
 import LoginPage from './auth/LoginPage.jsx';
+import SignupPage from './auth/SignupPage.jsx';
+import ForgotPasswordPage from './auth/ForgotPasswordPage.jsx';
 import ChatPage from './chat/ChatPage.jsx';
 
 export default class App extends React.Component {
@@ -17,7 +18,7 @@ export default class App extends React.Component {
 
         this.state = {
             username: '',
-            isAuthenticated: false
+            isAuthenticated: true
         };
 
         this.authenticate = this.authenticate.bind(this);
@@ -46,8 +47,14 @@ export default class App extends React.Component {
                     <Route exact path="/login">
                         <LoginPage authenticate={this.authenticate} />
                     </Route>
+                    <Route exact path="/signup">
+                        <SignupPage/>
+                    </Route>
+                    <Route exact path="/forgotpsw">
+                        <ForgotPasswordPage/>
+                    </Route>
                     <PrivateRoute authed={isAuthenticated} path="/chat">
-                        <ChatPage client={this.props.client} currentUser={username} />
+                        <ChatPage currentUser={username} />
                     </PrivateRoute>
                     <Route>
                         <NotFoundPage />
@@ -56,8 +63,4 @@ export default class App extends React.Component {
             </div>
         );
     }
-}
-
-App.propTypes = {
-	client: PropTypes.instanceOf(Client)
 }

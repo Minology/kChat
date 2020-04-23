@@ -1,7 +1,7 @@
 import React from 'react';
 import CaseConvertor from '../utils/CaseConvertor.js';
 
-export default function Checkbox({ name, style="custom-checkbox", checked=false, onChange}) {
+export default function Checkbox({ name, showName=false, style="custom-checkbox", checked=false, onChange}) {
     if (!onChange) checked=undefined;
     return (
         <div className={"custom-control " + style}>
@@ -12,7 +12,9 @@ export default function Checkbox({ name, style="custom-checkbox", checked=false,
                 id={CaseConvertor.camelCase(name)}
                 checked={checked}
                 onChange={onChange}/>
-            <label className="custom-control-label" htmlFor={CaseConvertor.camelCase(name)}></label>
+            <label className="custom-control-label" htmlFor={CaseConvertor.camelCase(name)}>
+                {showName? name: undefined}
+            </label>
         </div>
     )
 }
