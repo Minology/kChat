@@ -102,7 +102,6 @@ class Connection(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     from_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='connections')
     to_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    request_message = models.TextField(blank=True,null=True)
 
     class Meta:
         unique_together = ('from_user', 'to_user')
