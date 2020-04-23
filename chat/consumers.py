@@ -17,7 +17,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def new_message(self, data):
-        sender = get_user(data['from'])
+        sender = self.user
         conversation = get_conversation(data['conversation_id'])
         conversation.message_count += 1
         attachment_type = get_attachment_type(data['attachment_type'])
@@ -69,7 +69,6 @@ class ChatConsumer(WebsocketConsumer):
             self.accept()
 
     def disconnect(self, close_code):
-        # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
@@ -129,7 +128,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def fetch_conversations_of_user(self, data):
-        user = get_user(data['username'])
+        user = self.user
         participants = Participant.objects.filter(user=user)
         conversations = []
         for participant in participants:
@@ -144,7 +143,7 @@ class ChatConsumer(WebsocketConsumer):
 
     def add_user_to_conversation(self, data):
         conversation = get_conversation(data['conversation_id'])
-        user = get_user(data['username'])
+        user = self.user
         Participant.objects.create(
             conversation=conversation,
             user=user
@@ -156,14 +155,15 @@ class ChatConsumer(WebsocketConsumer):
         return content  
 
     def remove_user_from_conversation(self, data):
-        Participant.objects.filter(id=data['participant_id']).delete()
+        conversation = get_conversation(data['conversation_id'])
+        Participant.objects.filter(user=self.user, conversation=conversation).delete()
         content = {
             'command': 'remove_user_from_conversation',
         }
         return content  
 
     def create_conversation(self, data):
-        user = get_user(data['username'])
+        user = self.user
         conversation = Conversation.objects.create(
             title=data['conversation_name'],
             creator=user,
@@ -202,7 +202,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def fetch_user_info(self, data):
-        user = get_user(data['username'])
+        user = self.user
         content = {
             'command': 'fetch_user_info',
             'user': self.user_to_json(user)
@@ -225,7 +225,7 @@ class ChatConsumer(WebsocketConsumer):
         return content        
 
     def fetch_not_friends(self, data):
-        user = get_user(data['username'])
+        user = self.user
         connections = user.connections.all()
         friends_id = [user.id]
         for connection in connections:
@@ -238,7 +238,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def fetch_all_friends(self, data):
-        user = get_user(data['username'])
+        user = self.user
         connections = user.connections.all()
         friends = []
         for connection in connections:
@@ -250,7 +250,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def send_friend_request(self, data):
-        from_user = get_user(data['from_username'])
+        from_user = self.user
         to_user = get_user(data['to_username'])
         request_message = data['request_message']
         request, created = FriendRequest.objects.get_or_create(
@@ -265,7 +265,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def fetch_friend_requests_of_user(self, data):
-        to_user = get_user(data['to_username'])
+        to_user = self.user
         requests = to_user.friend_requests.all()
         content = {
             'command': 'fetch_friend_requests_of_user',
@@ -274,7 +274,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def accept_friend_request(self, data):
-        from_user = get_user(data['from_username'])
+        from_user = self.user
         to_user = get_user(data['to_username'])
         FriendRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
         connections = []
@@ -286,7 +286,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def discard_friend_request(self, data):
-        from_user = get_user(data['from_username'])
+        from_user = self.user
         to_user = get_user(data['to_username']) 
         FriendRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
         content = {
@@ -295,7 +295,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def decline_friend_request(self, data):
-        from_user = get_user(data['from_username'])
+        from_user = self.user
         to_user = get_user(data['to_username'])
         FriendRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
         content = {
@@ -304,7 +304,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def remove_friend(self, data):
-        from_user = get_user(data['username'])
+        from_user = self.user
         to_user = get_user(data['friend_username'])
         Connection.objects.filter(from_user=from_user, to_user=to_user).delete()
         Connection.objects.filter(from_user=to_user, to_user=from_user).delete()
@@ -320,7 +320,7 @@ class ChatConsumer(WebsocketConsumer):
         for participant in participants:
             participants_id.append(participant.id)
 
-        user = get_user(data['username'])
+        user = self.user
         connections = user.connections.all()
         friends = []
         for connection in connections:
@@ -338,7 +338,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def fetch_conversations_last_message_from_user(self, data):
-        user = get_user(data['username'])
+        user = self.user
         participants = Participant.objects.filter(user=user)
         messages = []
         unread_counts = []
@@ -356,7 +356,7 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def update_last_seen_message(self, data):
-        user = get_user(data['username'])
+        user = self.user
         conversation = get_conversation(data['conversation_id'])
         participant = get_participant(user=user, conversation=conversation)
         if (participant.last_seen_message_id is None) or (participant.last_seen_message_id < data['last_seen_message_id']):
