@@ -5,9 +5,7 @@ import { ModalBody } from './styles.jsx';
 export default class FriendRequestModal extends React.Component {
     constructor(props) {
         super(props);
-        WebSocketInstance.connect();
-
-        WebSocketInstance.waitForSocketConnection(0, 100, () => {
+        WebSocketInstance.connectAndWait(0, 100, () => {
             WebSocketInstance.addCallbacks({
                 'accept_friend_request': this.handleResponse,
                 'decline_friend_request': this.handleResponse,
@@ -25,11 +23,11 @@ export default class FriendRequestModal extends React.Component {
     }
 
     handleAccept = () => {
-        WebSocketInstance.acceptFriendRequest(this.props.currentUser, this.props.fromUser);
+        WebSocketInstance.acceptFriendRequest(this.props.fromUser);
     }
 
     handleDecline = () => {
-        WebSocketInstance.declineFriendRequest(this.props.currentUser, this.props.fromUser);
+        WebSocketInstance.declineFriendRequest(this.props.fromUser);
     }
 
     render() {

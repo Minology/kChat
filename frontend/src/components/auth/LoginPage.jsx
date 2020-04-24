@@ -7,32 +7,41 @@ import {
 import AuthContainer from './AuthContainer.jsx';
 import ClientInstance from '../../Client.js';
 import Checkbox from '../Checkbox.jsx';
+import FormMesssage from '../FormMesssage.jsx';
 import AxiosInstance from '../../services/Axios.js';
 
-export default function LoginPage({ authenticate }) {
+export default function LoginPage({ unauthenticate, authenticate, remember, setRemember }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [remember, setRemember] = useState(false);
     const [redirectToReferer, setRedirectToReferer] = useState(false);
-    const [errored, setErrored] = useState(false);
+    const [error, setError] = useState("");
 
     let handleResponse = (response) => {
-        if (remember) {
-            AxiosInstance.defaults.headers['Authorization'] = "JWT " + response.data.key;
-            localStorage.setItem('refresh_token', response.data.key);
-        }
+        AxiosInstance.defaults.headers['Authorization'] = "Token " + response.data.key;
+        localStorage.setItem('refresh_token', response.data.key);
         authenticate(() => {
             setRedirectToReferer(true);
         });
     }
 
     let handleError = (error) => {
-        setErrored(true);
-        console.error('An error occurred: ' + error);
+        if (!error.response) {
+            console.error(error);
+            return;
+        }
+        const errorObject = error.response.data;
+        //console.error('An error occurred: ' + JSON.stringify(errorObject));
+        if (Object.keys(errorObject).length == 0) return;
+        const errorMessage = errorObject[Object.keys(errorObject)[0]][0];
+        if (errorMessage == "E-mail is not verified.") {
+            setError(errorMessage);
+        }
+        else setError("Incorrect email or password.");
     }
 
     let handleSubmit = (event) => {
         event.preventDefault();
+        unauthenticate();
         ClientInstance.postLogin(email, password)
             .then(handleResponse)
             .catch(handleError);
@@ -57,6 +66,7 @@ export default function LoginPage({ authenticate }) {
                             </Link>
                         </div>                                        
                         <h4 className="text-primary my-4">Log in !</h4>
+                        <FormMesssage type="error" message={error}/>
                         <div className="form-group">
                             <input
                                 type="email"

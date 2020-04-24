@@ -21,6 +21,7 @@ import ClientInstance from '../../Client.js';
 
 export default function Chat({ unauthenticate }) {
     const [tab, setTab] = useState("chat");
+    const [prevTab, setPrevTab] = useState(tab);
     const [conversationList, setConversationList] = useState([]);
     const [lastMessage, setLastMessage] = useState({});
     const [errored, setErrored] = useState(false);
@@ -29,26 +30,26 @@ export default function Chat({ unauthenticate }) {
     const [userInfo, setUserInfo] = useState({});
 
     let fetchConversationList = () => {
-        ClientInstance.getConversationList(userInfo.username)
-            .then((response) => {
-                let results = [];
-
-                response.data.forEach(conversation => {
-                    results = results.concat({
-                        id: conversation.id,
-                        title: conversation.title,
-                        creator: conversation.creator,
-                        created_at: conversation.created_at,
+        WebSocketInstance.connectAndWait(0, 100, () => {
+            WebSocketInstance.addCallbacks({
+                'conversations_of_user': (conversations) => {
+                    let newConversationList = [];
+                    
+                    conversations.forEach(conversation => {
+                        newConversationList = newConversationList.concat({
+                            id: conversation.conversation_id,
+                            title: conversation.title,
+                            creator: conversation.creator_username,
+                            created_at: conversation.created_at,
+                        });
+                        WebSocketInstance.connect(conversation.conversation_id);
                     });
-                    WebSocketInstance.connect(conversation.id);
-                });
 
-                setConversationList(results);
-            })
-            .catch((error) => {
-                console.log('An error occurred: ' + error);
-                setErrored(true);
+                    setConversationList(newConversationList);
+                },
             });
+            WebSocketInstance.fetchConversations();
+        });
     }
 
     let fetchFriendRequests = () => {
@@ -66,14 +67,13 @@ export default function Chat({ unauthenticate }) {
                     setFriendRequestList(newFriendRequestList);
                 },
             });
-            WebSocketInstance.fetchFriendRequests(userInfo.username);
+            WebSocketInstance.fetchFriendRequests();
         });
     }
 
     let fetchUserInfo = (callback) => {
         ClientInstance.getUserInfo()
             .then((response) => {
-                console.log(response.data);
                 setUserInfo(new UserInfo(
                     undefined,
                     response.data.username,
@@ -87,7 +87,7 @@ export default function Chat({ unauthenticate }) {
                 callback();
             })
             .catch((error) => {
-                console.error('An error occurred: ' + error);
+                //console.error('An error occurred: ' + error);
                 setErrored(true);
                 unauthenticate();
             })
@@ -125,11 +125,10 @@ export default function Chat({ unauthenticate }) {
             : tab == "friends"? (
                 <div>
                     <ModalContainer modalName="addFriend" fullname="Add Friend">
-                        <AddFriendModal currentUser={userInfo.username}/>
+                        <AddFriendModal />
                     </ModalContainer>
                     <ModalContainer modalName="friendRequest" fullname={"Friend Request From " + selectingFriendRequest}>
                         <FriendRequestModal
-                            currentUser={userInfo.username}
                             fromUser={selectingFriendRequest}
                             friendRequestList={friendRequestList}
                             setFriendRequestList={setFriendRequestList}
@@ -141,6 +140,13 @@ export default function Chat({ unauthenticate }) {
     }
 
     let getBar = () => {
+        if (prevTab != tab) {
+            if (tab == "chat") fetchConversationList();
+            else if (tab == "friends") fetchFriendRequests();
+            
+            setPrevTab(tab);
+        }
+
         return <div
             className="tab-pane fade show active"
             id={"pills-" + tab + "-justified"}
@@ -148,9 +154,9 @@ export default function Chat({ unauthenticate }) {
             aria-labelledby={"pills-" + tab + "-tab-justified"}>
             {
                 tab == "chat"? <ChatBar conversations={conversationList} lastMessage={lastMessage}/>
-                : tab == "friends"? 
+                : tab == "friends"?
                     <FriendRequestBar friendRequests={friendRequestList} setSelectingFriendRequest={setSelectingFriendRequest}/>
-                : tab == "profile"? <ProfileBar userInfo={userInfo}/>
+                : tab == "profile"? <ProfileBar userInfo={userInfo} unauthenticate={unauthenticate}/>
                 : tab == "setting"? <SettingBar/>
                 : <h4>Oops! An error occurred.</h4>
             }

@@ -10,13 +10,15 @@ import LoginPage from './auth/LoginPage.jsx';
 import SignupPage from './auth/SignupPage.jsx';
 import ForgotPasswordPage from './auth/ForgotPasswordPage.jsx';
 import ChatPage from './chat/ChatPage.jsx';
+import AxiosInstance from '../services/Axios.js';
 
 export default class App extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            isAuthenticated: true
+            isAuthenticated: true,
+            remember: true
         };
     }
 
@@ -31,11 +33,36 @@ export default class App extends React.Component {
         this.setState({
             isAuthenticated: false
         });
+        localStorage.removeItem('refresh_token');
+        AxiosInstance.defaults.headers['Authorization'] = null;
+    }
+
+    setRemember = (remember) => {
+        this.setState({
+            remember: remember
+        });
+    }
+
+    componentCleanup = () => {
+        if (!this.state.remember) {
+            localStorage.removeItem('refresh_token');
+            AxiosInstance.defaults.headers['Authorization'] = null;
+        }
+    }
+
+    componentDidMount() {
+        window.addEventListener('beforeunload', this.componentCleanup);
+    }
+
+    componentWillUnmount() {
+        this.componentCleanup();
+        window.removeEventListener('beforeunload', this.componentCleanup);
     }
 
     render() {
         const {
-            isAuthenticated
+            isAuthenticated,
+            remember
         } = this.state;
 
         return (
@@ -45,7 +72,12 @@ export default class App extends React.Component {
                         <HomePage />
                     </Route>
                     <Route exact path="/login">
-                        <LoginPage authenticate={this.authenticate} />
+                        <LoginPage
+                            unauthenticate={this.unauthenticate}
+                            authenticate={this.authenticate}
+                            remember={remember}
+                            setRemember={this.setRemember}
+                        />
                     </Route>
                     <Route exact path="/signup">
                         <SignupPage/>
