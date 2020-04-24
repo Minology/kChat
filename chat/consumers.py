@@ -4,6 +4,7 @@ from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from .models import Message, Conversation, AttachmentType, Participant, Connection, FriendRequest, User
 from .views import get_last_10_messages, get_user, get_conversation, get_attachment_type, get_participant, get_user_by_email
+from django.core.exceptions import PermissionDenied
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -107,38 +108,16 @@ class ChatConsumer(WebsocketConsumer):
     def chat_message(self, event):
         message = event['message']
 
-    
-    def fetch_participants_of_conversation(self, data):
-        conversation = get_conversation(data['conversation_id'])
-        participants = Participant.objects.filter(conversation=conversation)
-        content = {
-            'command': 'participants_of_conversation',
-            'participants': self.users_to_json(participants)
-        }
-        return content
 
-    def fetch_users_outside_of_conversation(self, data):
-        conversation = get_conversation(data['conversation_id'])
-        participants = Participant.objects.filter(conversation=conversation)
-        participants_id = []
-        for participant in participants:
-            participants_id.append(participant.id)
-        outsiders = User.objects.exclude(id__in=participants_id)
-        content = {
-            'command': 'users_outside_of_conversation',
-            'outsiders': self.users_to_json(outsiders)
-        }
-        return content
-
-    def fetch_conversations_of_user(self, data):
-        user = get_user(data['username'])
+    def fetch_conversations(self, data):
+        user = self.user
         participants = Participant.objects.filter(user=user)
         conversations = []
         for participant in participants:
             conversations.append(participant.conversation)
         conversations.sort(key=lambda x: 0 if x.last_message_id is None else x.last_message_id, reverse=True)
         content = {
-            'command': 'conversations_of_user',
+            'command': 'conversations',
             'conversations': self.conversations_to_json(conversations)
         }
         return content     
@@ -146,6 +125,8 @@ class ChatConsumer(WebsocketConsumer):
 
     def add_user_to_conversation(self, data):
         conversation = get_conversation(data['conversation_id'])
+        if conversation.creator.id != self.user.id:
+            raise PermissionDenied('You don\'t have permission to add user to conversation %s' % conversation.title)
         user = get_user(data['username'])
         Participant.objects.create(
             conversation=conversation,
@@ -158,7 +139,11 @@ class ChatConsumer(WebsocketConsumer):
         return content  
 
     def remove_user_from_conversation(self, data):
-        Participant.objects.filter(id=data['participant_id']).delete()
+        conversation = get_conversation(data['conversation_id'])
+        if conversation.creator.id != self.user.id:
+            raise PermissionDenied('You don\'t have permission to remove user from conversation %s' % conversation.title)
+        user = get_user(data['username'])
+        Participant.objects.filter(user=user, conversation=conversation).delete()
         content = {
             'command': 'remove_user_from_conversation',
         }
@@ -209,22 +194,7 @@ class ChatConsumer(WebsocketConsumer):
             'command': 'fetch_user_info',
             'user': self.user_to_json(user)
         }
-        return content
-
-    def fetch_users_info(self):
-        content = {
-            'command': 'fetch_users_info',
-            'users': self.users_to_json(User.objects.all().order_by('username')[:50])
-        }
-        return content
-
-    def fetch_user_info_by_email(self, data):
-        user = get_user_by_email(data['email'])
-        content = {
-            'command': 'fetch_user_info',
-            'user': self.user_to_json(user)
-        }
-        return content        
+        return content     
 
     def fetch_not_friends(self, data):
         user = get_user(data['username'])
@@ -266,11 +236,11 @@ class ChatConsumer(WebsocketConsumer):
         }
         return content
 
-    def fetch_friend_requests_of_user(self, data):
-        to_user = get_user(data['to_username'])
+    def fetch_friend_requests(self, data):
+        to_user = self.user
         requests = to_user.friend_requests.all()
         content = {
-            'command': 'fetch_friend_requests_of_user',
+            'command': 'fetch_friend_requests',
             'requests': self.friend_requests_to_json(requests)
         }
         return content
@@ -295,15 +265,6 @@ class ChatConsumer(WebsocketConsumer):
         content = {
             'command': 'discard_friend_request',
         }       
-        return content
-
-    def decline_friend_request(self, data):
-        from_user = get_user(data['from_username'])
-        to_user = get_user(data['to_username'])
-        FriendRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
-        content = {
-            'command': 'decline_friend_request',
-        }        
         return content
 
     def remove_friend(self, data):
@@ -424,9 +385,7 @@ class ChatConsumer(WebsocketConsumer):
     commands = {
         'fetch_messages': fetch_messages,
         'new_message': new_message,
-        'fetch_participants_of_conversation': fetch_participants_of_conversation,
-        'fetch_users_outside_of_conversation': fetch_users_outside_of_conversation,
-        'fetch_conversations_of_user': fetch_conversations_of_user,
+        'fetch_conversations': fetch_conversations,
         'add_user_to_conversation': add_user_to_conversation,
         'remove_user_from_conversation': remove_user_from_conversation,
         'create_conversation': create_conversation,
@@ -434,15 +393,12 @@ class ChatConsumer(WebsocketConsumer):
         'search_conversation': search_conversation,
         'search_user': search_user,
         'fetch_user_info': fetch_user_info,
-        'fetch_user_info_by_email': fetch_user_info_by_email,
-        'fetch_users_info': fetch_users_info,
         'fetch_not_friends': fetch_not_friends,
         'fetch_all_friends': fetch_all_friends,
         'send_friend_request': send_friend_request,
-        'fetch_friend_requests_of_user': fetch_friend_requests_of_user,
+        'fetch_friend_requests': fetch_friend_requests,
         'accept_friend_request': accept_friend_request,
         'discard_friend_request': discard_friend_request,
-        'decline_friend_request': decline_friend_request,
         'remove_friend': remove_friend,
         'fetch_friends_outside_of_conversation': fetch_friends_outside_of_conversation,
         'update_last_seen_message': update_last_seen_message,
