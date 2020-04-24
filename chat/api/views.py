@@ -11,8 +11,11 @@ from rest_framework.response import Response
 
 from chat.models import Conversation, Participant, Message, User, AttachmentType, Connection, FriendRequest
 from chat.views import get_user, get_conversation
-from .serializers import ConversationSerializer, MessageSerializer, UserSerializer, AttachmentTypeSerializer, \
+from .serializers import ConversationSerializer, MessageSerializer, AttachmentTypeSerializer, \
     ParticipantSerializer, ConnectionSerializer, FriendRequestSerializer
+from django.core.exceptions import PermissionDenied
+from accounts.serializers import UserDetailsSerializer
+import logging
 
 
 class ConversationListView(ListAPIView):
@@ -37,6 +40,78 @@ class ConversationDetailView(RetrieveAPIView):
     permission_classes = (permissions.AllowAny,)
 
 
+class ConversationParticipantListView(ListAPIView):
+    queryset = Conversation.objects.all()
+    serializer_class = ConversationSerializer
+
+    def list(self, request, *args, **kwargs):
+        error_notfound = {'detail': 'Resource not found'}
+        error_forbidden = {'detail': 'Forbidden resource'}
+        instance = self.get_object()
+
+        # check anonymous
+        user = self.request.user
+        if user.is_anonymous:
+            return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+
+        # get conversation
+        if instance is None:
+            return Response(error_msg, status=status.HTTP_404_NOT_FOUND)
+
+        # get participants
+        participants = Participant.objects.filter(conversation=conversation)
+        serializer = ParticipantSerializer(participants, many=True)
+
+        # check superuser
+        if user.is_superuser:
+            return Response(serializer.data)
+
+        # check participating
+        for participant in participants:
+            if participant.user.id == user.id:
+                return Response(serializer.data)
+
+        return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+
+
+class ConversationNonParticipantListView(ListAPIView):
+    queryset = Conversation.objects.all()
+    serializer_class = ConversationSerializer
+
+    def list(self, request, *args, **kwargs):
+        error_notfound = {'detail': 'Resource not found'}
+        error_forbidden = {'detail': 'Forbidden resource'}
+        instance = self.get_object()
+
+        # check anonymous
+        user = self.request.user
+        if user.is_anonymous:
+            return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+
+        # get conversation
+        if instance is None:
+            return Response(error_msg, status=status.HTTP_404_NOT_FOUND)
+
+        # get participants
+        participants = Participant.objects.filter(conversation=conversation)
+        participants_id = []
+        for participant in participants:
+            participants_id.append(participant.id)
+        outsiders = User.objects.exclude(id__in=participants_id)
+        serializer = UserDetailsSerializer(outsiders, many=True)
+
+        # check superuser
+        if user.is_superuser:
+            return Response(serializer.data)
+
+        # check participating
+        for participant in participants:
+            if participant.user.id == user.id:
+                return Response(serializer.data)
+
+        return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)  
+
+
 class ConversationCreateView(CreateAPIView):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
@@ -52,7 +127,26 @@ class ConversationUpdateView(RetrieveUpdateAPIView):
 class ConversationDeleteView(DestroyAPIView):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+
+    def destroy(self, request, *args, **kwargs):
+        error_notfound = {'detail': 'Resource not found'}
+        error_forbidden = {'detail': 'Forbidden resource'}
+        instance = self.get_object()
+
+        # check anonymous
+        user = self.request.user
+        if user.is_anonymous:
+            return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+
+        # get conversation
+        if instance is None:
+            return Response(error_msg, status=status.HTTP_404_NOT_FOUND)
+
+        if (user.id != instance.creator.id):
+            return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class MessageListView(ListAPIView):
@@ -67,8 +161,6 @@ class MessageListView(ListAPIView):
             queryset = Message.objects.filter(conversation_id=conversation_id)
         return queryset
 
-
-import logging
 
 class MessageDetailView(RetrieveAPIView):
     queryset = Message.objects.all()
@@ -125,7 +217,7 @@ class MessageDeleteView(DestroyAPIView):
 
 
 class UserListView(ListAPIView):
-    serializer_class = UserSerializer
+    serializer_class = UserDetailsSerializer
     permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
@@ -138,20 +230,20 @@ class UserListView(ListAPIView):
 
 class UserDetailView(RetrieveAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailsSerializer
     permission_classes = (permissions.AllowAny,)
 
 
 class UserUpdateView(RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailsSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
 
 class AttachmentTypeListView(ListAPIView):
     queryset = AttachmentType.objects.all()
     serializer_class = AttachmentTypeSerializer
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAdminUser,)
 
 
 class ParticipantListView(ListAPIView):
