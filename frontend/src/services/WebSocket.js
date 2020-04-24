@@ -50,32 +50,29 @@ class WebSocketService {
         if (Object.keys(this.callbacks).length === 0) {
             return;
         }
-        if (command == 'conversations_of_user') {
-            this.callbacks[command](parsedData.conversations);
-        }
         if (command === 'messages') {
             this.callbacks[command](parsedData.messages);
         }
         if (command === 'new_message') {
             this.callbacks[command](parsedData.message);
         }
-        if (command == 'fetch_not_friends') {
-            this.callbacks[command](parsedData.strangers);
+        if (command == 'last_messages') {
+            this.callbacks[command]({
+                last_messages: parsedData.last_messages,
+                unread_counts: parsedData.unread_counts,
+            });
+        }
+        if (command == 'update_last_seen_message') {
+            this.callbacks[command](parsedData.log == 'Command executed successfully');
         }
         if (command == 'send_friend_request') {
             //console.log(parsedData);
         }
-        if (command == 'fetch_friend_requests_of_user') {
-            this.callbacks[command](parsedData.requests);
-        }
         if (command == 'accept_friend_request') {
             this.callbacks[command](true);
         }
-        if (command == 'decline_friend_request') {
+        if (command == 'discard_friend_request') {
             this.callbacks[command](parsedData.log == 'Command executed successfully');
-        }
-        if (command == 'fetch_all_friends') {
-            this.callbacks[command](parsedData.friends);
         }
         if (command == 'create_conversation') {
             this.callbacks[command]({
@@ -91,12 +88,6 @@ class WebSocketService {
         }
     }
 
-    fetchConversations() {
-        this.sendMessage(0, {
-            command: 'fetch_conversations_of_user',
-        });
-    }
-
     fetchMessages(conversationId) {
         this.sendMessage(conversationId, { 
             command: 'fetch_messages', 
@@ -104,23 +95,25 @@ class WebSocketService {
         });
     }
 
-    fetchNotFriends() {
+    fetchLastMessages() {
         this.sendMessage(0, {
-            command: 'fetch_not_friends',
+            command: 'fetch_conversations_last_message_from_user',
+        })
+    }
+
+    updateLastSeenMessage(conversationId, messageId) {
+        this.sendMessage(conversationId, { 
+            command: 'update_last_seen_message',
+            conversation_id: conversationId,
+            last_seen_message_id: messageId,
         });
     }
 
-    sendFriendRequest(toUsername) {
+    sendFriendRequest(toUsername, message) {
         this.sendMessage(0, {
             command: 'send_friend_request',
             to_username: toUsername,
-            request_message: "Hi!"
-        });
-    }
-    
-    fetchFriendRequests() {
-        this.sendMessage(0, {
-            command: 'fetch_friend_requests_of_user',
+            request_message: message,
         });
     }
 
@@ -133,14 +126,8 @@ class WebSocketService {
 
     declineFriendRequest(fromUsername) {
         this.sendMessage(0, {
-            command: 'decline_friend_request',
+            command: 'discard_friend_request',
             from_username: fromUsername,
-        });
-    }
-
-    fetchFriends() {
-        this.sendMessage(0, {
-            command: 'fetch_all_friends',
         });
     }
 
@@ -168,10 +155,9 @@ class WebSocketService {
         });
     }
 
-    fetchUserInfo(username) {
+    fetchUserInfo() {
         this.sendMessage(0, {
             command: 'fetch_user_info',
-            username: username,
         });
     }
 

@@ -1,8 +1,10 @@
 import React from 'react';
+import ClientInstance from '../../../services/Client.js';
+import WebSocketInstance from '../../../services/WebSocket.js';
 import ChatSearch from '../ChatSearch.jsx';
 import UserList from '../../UserList.jsx';
-import WebSocketInstance from '../../../services/WebSocket.js';
-import UserInfo from '../../../UserInfo.js';
+import UserInfoResponse from '../../../response_processors/UserInfoResponse.js';
+import ConversationResponse from '../../../response_processors/ConversationResponse.js';
 
 export default class NewConversationModal extends React.Component {
     constructor(props) {
@@ -11,43 +13,32 @@ export default class NewConversationModal extends React.Component {
             friendList: [],
             newConversation: "",
             usersToAdd: {},
+            errored: false
         }
+
+        ClientInstance.getFriendList()
+            .then((response) => {
+                let newFiendList = response.data.map(friend => new UserInfoResponse(friend, "http"));
+        
+                this.setState({friendList: newFiendList});
+            })
+            .catch((error) => {
+                console.error('An error occurred: ' + error);
+                this.setState({errored: true});
+            })
         
         WebSocketInstance.connectAndWait(0, 100, () => {
             WebSocketInstance.addCallbacks({
-                'fetch_all_friends': this.setFriendList,
                 'create_conversation': this.addUsers,
                 'add_user_to_conversation': this.handleFailedAddUserRequest,
             });
-            WebSocketInstance.fetchFriends();
         });
-    }
-
-    setFriendList = (friends) => {
-        let newFiendList = friends.map(friend => {
-            return new UserInfo(
-                friend.user_id,
-                friend.username,
-                friend.first_name,
-                friend.last_name,
-                friend.email,
-                friend.quote,
-                undefined
-            );
-        });
-
-        this.setState({friendList: newFiendList});
     }
 
     addUsers = (response) => {
         if (response.successful) {
             const conversation = response.conversation;
-            this.props.setConversationList([...this.props.conversationList, {
-                id: conversation.conversation_id,
-                title: conversation.title,
-                creator: conversation.creator_username,
-                created_at: conversation.created_at,
-            }]);
+            this.props.setConversationList([...this.props.conversationList, new ConversationResponse(conversation, "ws")]);
             if (this.props.currentUser != response.conversation.creator_username) return;
 
             WebSocketInstance.connectAndWait(conversation.conversation_id, 100, () => {
@@ -106,9 +97,12 @@ export default class NewConversationModal extends React.Component {
     }
 
     render() {
-        const friendList = this.state.friendList;
-        const newConversationName = this.state.newConversation;
-        const usersToAdd = this.state.usersToAdd;
+        const {
+            friendList,
+            newConversationName,
+            usersToAdd,
+            errored
+        } = this.state;
         return (
             <div className="modal-body">
                 <form onSubmit={this.handleSubmit}>
@@ -134,7 +128,17 @@ export default class NewConversationModal extends React.Component {
                     </div>
                     <ChatSearch />
                     <div className="add-users-list">
-                        <UserList userInfos={friendList} withCheckbox={true} checkedUsers={usersToAdd} onChange={this.handleUsersChange}/>
+                        {
+                            errored?<h4>Oops! An error occurred.</h4>
+                            :
+                            <UserList
+                                userInfos={friendList}
+                                infosToHide={{"location": true}}
+                                withCheckbox={true}
+                                checkedUsers={usersToAdd}
+                                onChange={this.handleUsersChange}
+                            />
+                        }
                     </div>
                     <div className="mt-3 text-center">
                         <button type="submit" className="btn btn-primary">

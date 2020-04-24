@@ -1,8 +1,9 @@
 import React from 'react';
+import ClientInstance from '../../../services/Client.js';
+import WebSocketInstance from '../../../services/WebSocket.js';
 import ChatSearch from '../ChatSearch.jsx';
 import UserList from '../../UserList.jsx';
-import WebSocketInstance from '../../../services/WebSocket.js';
-import UserInfo from '../../../UserInfo.js';
+import UserInfoResponse from '../../../response_processors/UserInfoResponse.js';
 
 export default class AddRequestModal extends React.Component {
     constructor(props) {
@@ -10,30 +11,24 @@ export default class AddRequestModal extends React.Component {
         this.state = {
             strangerList: [],
             chosenUser: undefined,
+            message: "",
+            errored: false,
         }
-        
-        WebSocketInstance.connectAndWait(0, 100, () => {
-            WebSocketInstance.addCallbacks({
-                'fetch_not_friends': this.setStrangerList,
-            });
-            WebSocketInstance.fetchNotFriends();
-        });
+
+        this.getNotFriendList();
     }
 
-    setStrangerList = (strangers) => {
-        let newStrangerList = strangers.map(stranger => {
-            return new UserInfo(
-                stranger.user_id,
-                stranger.username,
-                stranger.first_name,
-                stranger.last_name,
-                stranger.email,
-                undefined,
-                stranger.place
-            );
-        });
-
-        this.setState({strangerList: newStrangerList});
+    getNotFriendList = (query) => {
+        ClientInstance.getNotFriendList(query)
+            .then((response) => {
+                let newStrangerList = response.data.map(stranger => new UserInfoResponse(stranger, "http"));
+        
+                this.setState({strangerList: newStrangerList});
+            })
+            .catch((error) => {
+                console.error('An error occurred: ' + error);
+                this.setState({errored: true});
+            })
     }
 
     handleChange = (event) => {
@@ -46,29 +41,49 @@ export default class AddRequestModal extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        WebSocketInstance.sendFriendRequest(this.state.chosenUser);
+        WebSocketInstance.connectAndWait(0, 100, () => {
+            WebSocketInstance.sendFriendRequest(this.state.chosenUser, this.state.message);
+        });
         this.refs.hiddenButton.click();
     }
 
     render() {
-        const strangerList = this.state.strangerList;
-        const chosenUser = this.state.chosenUser;
+        const {
+            strangerList,
+            chosenUser,
+            message,
+            errored,
+        } = this.state;
         return (
             <div className="modal-body">
                 <form onSubmit={this.handleSubmit}>
                     <div className="form-group">
-                        <textarea className="form-control" name="groupDesc" id="groupDescAddFriend" rows="5" placeholder="Enter Message"></textarea>
+                        <textarea
+                            className="form-control"
+                            name="groupDesc"
+                            id="groupDescAddFriend"
+                            rows="5"
+                            value={message}
+                            placeholder="Enter Message"
+                            onChange={(e) => {e.preventDefault(); this.setState({message: e.target.value});}}
+                        />
                     </div>
                     <p className="add-friend-header">Send Friend Request To: {chosenUser} ?</p>
                     <div className="added-users"></div>
-                    <ChatSearch />
+                    <ChatSearch handleSearch={this.getNotFriendList}/>
                     <div className="add-friend-list">
-                        <UserList 
-                            userInfos={strangerList} 
-                            withCheckbox={true}
-                            oneOnly={true}
-                            chosenUser={chosenUser}
-                            onChange={this.handleChange}/>
+                        {
+                            errored?<h4>Oops! An error occurred.</h4>
+                            :
+                            <UserList 
+                                userInfos={strangerList}
+                                infosToHide={{"quote": true}}
+                                withCheckbox={true}
+                                oneOnly={true}
+                                chosenUser={chosenUser}
+                                onChange={this.handleChange}
+                            />
+                        }
                     </div>
                     <div className="mt-3 text-center">
                         <button type="submit" className="btn btn-primary">

@@ -1,8 +1,9 @@
 import React from 'react';
+import WebSocketInstance from '../../../services/WebSocket.js';
 import ConversationInput from './ConversationInput.jsx';
 import Call from './call/Call.jsx';
 import MessageList from './MessageList.jsx';
-import WebSocketInstance from '../../../services/WebSocket.js';
+import MessageResponse from '../../../response_processors/MessageResponse.js';
 
 export default class Conversation extends React.Component {
     constructor(props) {
@@ -15,7 +16,8 @@ export default class Conversation extends React.Component {
         WebSocketInstance.connectAndWait(this.props.details.id, 100, () => {
             WebSocketInstance.addCallbacks({
                 'messages': this.setMessageList,
-                'new_message': this.getMessage
+                'new_message': this.getMessage,
+                'update_last_seen_message': this.handleFailedUpdateRequest,
             });
             WebSocketInstance.fetchMessages(this.props.details.id);
         });
@@ -32,37 +34,33 @@ export default class Conversation extends React.Component {
     scrollToBottom = () => {
         this.messagesEnd.scrollIntoView({ behavior: "smooth" });
     }
-
-    processMessage = (message) => {
-        return {
-            id: message.id,
-            conversationId: message.conversation,
-            created_at: message.created_at,
-            content: message.message,
-            sender: message.sender,
-            attachment_type: message.attachment_type,
-        }
-    }
     
     setMessageList = (response) => {
         if (response.length == 0) return;
         let messageList = [];
 
         response.reverse().forEach(message => {
-            messageList = messageList.concat(this.processMessage(message));
+            messageList = messageList.concat(new MessageResponse(message, "ws"));
         });
 
         this.setState({ messageList: messageList});
         this.props.updateLastMessage(messageList[messageList.length - 1], true);
+        WebSocketInstance.updateLastSeenMessage(this.props.details.id, messageList[messageList.length - 1].id);
     }
 
     getMessage = (message) => {
-        message = this.processMessage(message);
+        message = new MessageResponse(message, "ws");
         const isSeen = message.conversationId == this.props.details.id;
         if (isSeen) {
             this.setState({ messageList: [...this.state.messageList, message]});
         }
         this.props.updateLastMessage(message, isSeen);
+        WebSocketInstance.updateLastSeenMessage(this.props.details.id, message.id);
+    }
+
+    handleFailedUpdateRequest = (successful) => {
+        const last_seen_message = this.state.messageList[this.state.messageList.length - 1];
+        if (!successful) WebSocketInstance.updateLastSeenMessage(this.props.details.id, last_seen_message.id);
     }
 
     sendMessage = (message) => {

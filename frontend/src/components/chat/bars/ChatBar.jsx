@@ -2,7 +2,7 @@ import React from 'react';
 import ChatList from '../ChatList.jsx';
 import ChatSearch from '../ChatSearch.jsx';
 
-export default function ChatListBar({ conversations, lastMessage }) {
+export default function ChatListBar({ conversations, lastMessage, handleChatSearch }) {
     return (
         <div className="chat-listbar">
             <div className="chat-left-headbar">
@@ -24,7 +24,7 @@ export default function ChatListBar({ conversations, lastMessage }) {
                     </div>
                 </div>
             </div>
-            <ChatSearch />
+            <ChatSearch handleSearch={handleChatSearch} />
             <div className="chat-left-body">
                 <ChatList conversations={conversations} lastMessage={lastMessage}/>
             </div>

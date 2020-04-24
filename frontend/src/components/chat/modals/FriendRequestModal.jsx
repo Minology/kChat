@@ -17,26 +17,29 @@ export default class FriendRequestModal extends React.Component {
         if (successful) {
             this.refs.hiddenButton.click();
             this.props.setFriendRequestList(
-                this.props.friendRequestList.filter((friendRequest) => { return friendRequest.fromUser != this.props.fromUser})
+                this.props.friendRequestList.filter((friendRequest) => {
+                    return friendRequest.fromUser != this.props.friendRequest.fromUser
+                })
             );
         }
     }
 
     handleAccept = () => {
-        WebSocketInstance.acceptFriendRequest(this.props.fromUser);
+        WebSocketInstance.acceptFriendRequest(this.props.friendRequest.fromUser);
     }
 
     handleDecline = () => {
-        WebSocketInstance.declineFriendRequest(this.props.fromUser);
+        WebSocketInstance.declineFriendRequest(this.props.friendRequest.fromUser);
     }
 
     render() {
-        const fromUser = this.props.fromUser;
+        const fromUser = this.props.friendRequest.fromUser;
+        const message = this.props.friendRequest.message;
         return (
             <ModalBody>
                 <img src="../../../../public/assets/images/men.svg" alt="avatar" className="rounded-circle"/>
                 <h5>{fromUser}</h5>
-                <p></p>
+                <p>{message}</p>
                 <button type="button" className="btn btn-success mr-3" onClick={this.handleAccept}>
                     <i className="feather icon-check mr-2"></i>Accept
                 </button>

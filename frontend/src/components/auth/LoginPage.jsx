@@ -4,11 +4,11 @@ import {
     Link,
     Redirect
 } from 'react-router-dom';
+import AxiosInstance from '../../services/Axios.js';
+import ClientInstance from '../../services/Client.js';
 import AuthContainer from './AuthContainer.jsx';
-import ClientInstance from '../../Client.js';
 import Checkbox from '../Checkbox.jsx';
 import FormMesssage from '../FormMesssage.jsx';
-import AxiosInstance from '../../services/Axios.js';
 
 export default function LoginPage({ unauthenticate, authenticate, remember, setRemember }) {
     const [email, setEmail] = useState('');

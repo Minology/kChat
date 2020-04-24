@@ -3,6 +3,7 @@ import {
     Switch,
     Route
 } from 'react-router-dom';
+import AxiosInstance from '../services/Axios.js';
 import PrivateRoute from './PrivateRoute.jsx';
 import NotFoundPage from './NotFoundPage.jsx';
 import HomePage from './home/HomePage.jsx';
@@ -10,7 +11,6 @@ import LoginPage from './auth/LoginPage.jsx';
 import SignupPage from './auth/SignupPage.jsx';
 import ForgotPasswordPage from './auth/ForgotPasswordPage.jsx';
 import ChatPage from './chat/ChatPage.jsx';
-import AxiosInstance from '../services/Axios.js';
 
 export default class App extends React.Component {
     constructor(props) {
