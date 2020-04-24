@@ -1,29 +1,41 @@
 from channels.auth import AuthMiddlewareStack
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import AnonymousUser
+from django.db import close_old_connections
+from channels.db import database_sync_to_async
 
+@database_sync_to_async
+def get_user(token_key):
+    try:
+        token = Token.objects.get(key=token_key)
+        close_old_connections()
+        return token.user
+    except Token.DoesNotExist:
+        return AnonymousUser()
 
-class TokenAuthMiddleware:
+class TokenAuthMiddlewareInstance:
     """
     Token authorization middleware for Django Channels 2
     """
 
+    def __init__(self, scope, middleware):
+        self.middleware = middleware
+        self.scope = dict(scope)
+        self.inner = self.middleware.inner
+
+    async def __call__(self, receive, send):
+        query = dict((x.split('=') for x in self.scope['query_string'].decode().split("&")))
+        if 'token' in query:
+            token_key = query['token']
+            self.scope['user'] = await get_user(token_key)
+        inner = self.inner(self.scope)
+        return await inner(receive, send)
+
+class TokenAuthMiddleware:
     def __init__(self, inner):
         self.inner = inner
 
     def __call__(self, scope):
-        headers = dict(scope["headers"])
-        if b"X-Auth-Token" in headers[b"cookie"]:
-            try:
-                cookies = headers[b"cookie"].decode()
-                token_key = re.search(b"X-Auth-Token=(.*)(; )?", cookies).group(1)
-                if token_key:
-                    token = Token.objects.get(key=token_key)
-                    scope["user"] = token.user
-                    close_old_connections()
-            except Token.DoesNotExist:
-                scope["user"] = AnonymousUser()
-
-        return self.inner(scope)
+        return TokenAuthMiddlewareInstance(scope, self)
 
 TokenAuthMiddlewareStack = lambda inner: TokenAuthMiddleware(AuthMiddlewareStack(inner))

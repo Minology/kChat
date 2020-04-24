@@ -5,10 +5,13 @@ from asgiref.sync import async_to_sync
 from .models import Message, Conversation, AttachmentType, Participant, Connection, FriendRequest, User
 from .views import get_last_10_messages, get_user, get_conversation, get_attachment_type, get_participant, get_user_by_email
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError
 
 
 class ChatConsumer(WebsocketConsumer):
     def fetch_messages(self, data):
+        conversation = get_conversation(data['conversation_id'])
+        get_participant(self.user, conversation)
         messages = get_last_10_messages(data['conversation_id'])
         json_messages = self.messages_to_json(messages)
         content = {
@@ -18,7 +21,9 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def new_message(self, data):
+        conversation = get_conversation(data['conversation_id'])
         sender = self.user
+        get_participant(sender, conversation)
         conversation = get_conversation(data['conversation_id'])
         conversation.message_count += 1
         attachment_type = get_attachment_type(data['attachment_type'])
@@ -106,20 +111,6 @@ class ChatConsumer(WebsocketConsumer):
         message = event['message']
 
 
-    def fetch_conversations(self, data):
-        user = self.user
-        participants = Participant.objects.filter(user=user)
-        conversations = []
-        for participant in participants:
-            conversations.append(participant.conversation)
-        conversations.sort(key=lambda x: 0 if x.last_message_id is None else x.last_message_id, reverse=True)
-        content = {
-            'command': 'conversations',
-            'conversations': self.conversations_to_json(conversations)
-        }
-        return content     
-
-
     def add_user_to_conversation(self, data):
         conversation = get_conversation(data['conversation_id'])
         if conversation.creator.id != self.user.id:
@@ -140,7 +131,25 @@ class ChatConsumer(WebsocketConsumer):
         if conversation.creator.id != self.user.id:
             raise PermissionDenied('You don\'t have permission to remove user from conversation %s' % conversation.title)
         user = get_user(data['username'])
-        Participant.objects.filter(user=user, conversation=conversation).delete()
+        if user == self.user:
+            participants = Participant.objects.filter(conversation=conversation)
+            if (participants.count() > 1):
+                new_owner = get_user(data['new_owner_username'])
+                success = False
+                for participant in participants:
+                    if participant.user == new_owner:
+                        conversation.creator = new_owner
+                        conversation.save()
+                        success = True
+                        break
+                if success == False:
+                    raise IntegrityError('New owner isn\'t a participant of conversation %s' % conversation.title)
+                Participant.objects.filter(user=user, conversation=conversation).delete()
+            else:
+                Participant.objects.filter(user=user, conversation=conversation).delete()
+                conversation.delete()
+        else:
+            Participant.objects.filter(user=user, conversation=conversation).delete()
         content = {
             'command': 'remove_user_from_conversation',
         }
@@ -162,28 +171,6 @@ class ChatConsumer(WebsocketConsumer):
         }
         return content  
 
-    def remove_conversation(self, data):
-        Conversation.objects.filter(id=data['conversation_id']).delete()
-        content = {
-            'command': 'remove_conversation',
-        }
-        return content  
-
-    def search_conversation(self, data):
-        conversations = Conversation.objects.filter(title__contains = data['text'])
-        content = {
-            'command': 'search_conversation',
-            'conversations': self.conversations_to_json(conversations)
-        }
-        return content 
-
-    def search_user(self, data):
-        users = User.objects.filter(username__contains = data['text'])
-        content = {
-            'command': 'search_user',
-            'users': self.users_to_json(users)
-        }
-        return content
 
     def fetch_user_info(self, data):
         user = self.user
@@ -192,35 +179,14 @@ class ChatConsumer(WebsocketConsumer):
             'user': self.user_to_json(user)
         }
         return content     
-
-    def fetch_not_friends(self, data):
-        user = self.user
-        connections = user.connections.all()
-        friends_id = [user.id]
-        for connection in connections:
-            friends_id.append(connection.to_user.id)
-        strangers = User.objects.exclude(id__in=friends_id)
-        content = {
-            'command': 'fetch_not_friends',
-            'strangers': self.users_to_json(strangers)
-        }
-        return content
-
-    def fetch_all_friends(self, data):
-        user = self.user
-        connections = user.connections.all()
-        friends = []
-        for connection in connections:
-            friends.append(connection.to_user)
-        content = {
-            'command': 'fetch_all_friends',
-            'friends': self.users_to_json(friends)
-        }
-        return content
+    
 
     def send_friend_request(self, data):
         from_user = self.user
         to_user = get_user(data['to_username'])
+        connection = Connection.objects.filter(from_user=from_user, to_user=to_user)
+        if (connection is not None):
+            raise IntegrityError('Connection already exists')
         request_message = data['request_message']
         request, created = FriendRequest.objects.get_or_create(
             from_user=from_user,
@@ -233,18 +199,10 @@ class ChatConsumer(WebsocketConsumer):
         }
         return content
 
-    def fetch_friend_requests(self, data):
-        to_user = self.user
-        requests = to_user.friend_requests.all()
-        content = {
-            'command': 'fetch_friend_requests',
-            'requests': self.friend_requests_to_json(requests)
-        }
-        return content
 
     def accept_friend_request(self, data):
-        from_user = self.user
-        to_user = get_user(data['to_username'])
+        from_user = get_user(data['from_username'])
+        to_user = self.user
         FriendRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
         connections = []
         connections.append(Connection.objects.get_or_create(from_user=from_user, to_user=to_user)[0])
@@ -255,8 +213,8 @@ class ChatConsumer(WebsocketConsumer):
         return content
 
     def discard_friend_request(self, data):
-        from_user = self.user
-        to_user = get_user(data['to_username']) 
+        from_user = get_user(data['from_username'])
+        to_user = self.user
         FriendRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
         content = {
             'command': 'discard_friend_request',
@@ -272,30 +230,7 @@ class ChatConsumer(WebsocketConsumer):
             'command': 'remove_friend',
         }
         return content
-
-    def fetch_friends_outside_of_conversation(self, data):
-        conversation = get_conversation(data['conversation_id'])
-        participants = Participant.objects.filter(conversation=conversation)
-        participants_id = []
-        for participant in participants:
-            participants_id.append(participant.id)
-
-        user = self.user
-        connections = user.connections.all()
-        friends = []
-        for connection in connections:
-            friends.append(connection.to_user)
         
-        friends_outside = []
-        for friend in friends:
-            if friend.id not in participants_id:
-                friends_outside.append(friend)
-
-        content = {
-            'command': 'friends_outside_of_conversation',
-            'friends_outside': self.users_to_json(friends_outside)
-        }
-        return content
 
     def fetch_conversations_last_message_from_user(self, data):
         user = self.user
@@ -381,22 +316,14 @@ class ChatConsumer(WebsocketConsumer):
     commands = {
         'fetch_messages': fetch_messages,
         'new_message': new_message,
-        'fetch_conversations': fetch_conversations,
         'add_user_to_conversation': add_user_to_conversation,
         'remove_user_from_conversation': remove_user_from_conversation,
         'create_conversation': create_conversation,
-        'remove_conversation': remove_conversation,
-        'search_conversation': search_conversation,
-        'search_user': search_user,
         'fetch_user_info': fetch_user_info,
-        'fetch_not_friends': fetch_not_friends,
-        'fetch_all_friends': fetch_all_friends,
         'send_friend_request': send_friend_request,
-        'fetch_friend_requests': fetch_friend_requests,
         'accept_friend_request': accept_friend_request,
         'discard_friend_request': discard_friend_request,
         'remove_friend': remove_friend,
-        'fetch_friends_outside_of_conversation': fetch_friends_outside_of_conversation,
         'update_last_seen_message': update_last_seen_message,
         'fetch_conversations_last_message_from_user': fetch_conversations_last_message_from_user,
     }
