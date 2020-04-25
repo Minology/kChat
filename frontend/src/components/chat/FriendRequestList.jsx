@@ -7,7 +7,7 @@ export default function FriendRequestList({ friendRequests, setSelectingFriendRe
         return friendRequests.map((friendRequest) =>
             <FriendRequestItem
                 key={friendRequest.fromUser}
-                fromUser={friendRequest.fromUser}
+                friendRequest={friendRequest}
                 setSelectingFriendRequest={setSelectingFriendRequest}
             />
         );

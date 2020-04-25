@@ -1,4 +1,4 @@
-import AxiosInstance from './services/Axios.js';
+import AxiosInstance from './Axios.js';
 
 class Client {
     static instance = null;
@@ -30,12 +30,28 @@ class Client {
         return await this._get('accounts/user');
     }
 
-    async getConversationList(username) {
+    async getConversationList(query) {
         const params = {
-            username: username,
+            contain: query,
         };
         
-        return await this._get('chat/conv', params);
+        return await this._get('api/user/conv', params);
+    }
+
+    async getFriendRequestList() {
+        return await this._get('api/user/fr_req');
+    }
+
+    async getFriendList() {
+        return await this._get('api/user/fr');
+    }
+
+    async getNotFriendList(query) {
+        const params = {
+            contain: query,
+        }
+
+        return await this._get('api/user/not_fr', params);
     }
 
     async _post(endpoint, data) {
