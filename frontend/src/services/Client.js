@@ -35,15 +35,15 @@ class Client {
             contain: query,
         };
         
-        return await this._get('chat/user/conv', params);
+        return await this._get('api/user/conv', params);
     }
 
     async getFriendRequestList() {
-        return await this._get('chat/user/fr_req');
+        return await this._get('api/user/fr_req');
     }
 
     async getFriendList() {
-        return await this._get('chat/user/fr');
+        return await this._get('api/user/fr');
     }
 
     async getNotFriendList(query) {
@@ -51,7 +51,7 @@ class Client {
             contain: query,
         }
 
-        return await this._get('chat/user/not_fr', params);
+        return await this._get('api/user/not_fr', params);
     }
 
     async _post(endpoint, data) {

@@ -1,34 +1,18 @@
 import React from 'react';
-import ClientInstance from '../../../services/Client.js';
 import WebSocketInstance from '../../../services/WebSocket.js';
 import ChatSearch from '../ChatSearch.jsx';
 import UserList from '../../UserList.jsx';
-import UserInfoResponse from '../../../response_processors/UserInfoResponse.js';
 
 export default class AddRequestModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            strangerList: [],
             chosenUser: undefined,
             message: "",
             errored: false,
         }
 
-        this.getNotFriendList();
-    }
-
-    getNotFriendList = (query) => {
-        ClientInstance.getNotFriendList(query)
-            .then((response) => {
-                let newStrangerList = response.data.map(stranger => new UserInfoResponse(stranger, "http"));
-        
-                this.setState({strangerList: newStrangerList});
-            })
-            .catch((error) => {
-                console.error('An error occurred: ' + error);
-                this.setState({errored: true});
-            })
+        this.props.handleSearch();
     }
 
     handleChange = (event) => {
@@ -48,12 +32,13 @@ export default class AddRequestModal extends React.Component {
     }
 
     render() {
+        const strangerList = this.props.strangerList;
         const {
-            strangerList,
             chosenUser,
             message,
             errored,
         } = this.state;
+
         return (
             <div className="modal-body">
                 <form onSubmit={this.handleSubmit}>
@@ -70,7 +55,7 @@ export default class AddRequestModal extends React.Component {
                     </div>
                     <p className="add-friend-header">Send Friend Request To: {chosenUser} ?</p>
                     <div className="added-users"></div>
-                    <ChatSearch handleSearch={this.getNotFriendList}/>
+                    <ChatSearch handleSearch={this.props.handleSearch}/>
                     <div className="add-friend-list">
                         {
                             errored?<h4>Oops! An error occurred.</h4>

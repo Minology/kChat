@@ -21,6 +21,7 @@ export default class FriendRequestModal extends React.Component {
                     return friendRequest.fromUser != this.props.friendRequest.fromUser
                 })
             );
+            this.props.fetchNotFriendList();
         }
     }
 

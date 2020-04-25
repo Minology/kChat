@@ -25,12 +25,13 @@ import FriendRequestResponse from '../../response_processors/FriendRequestRespon
 export default function Chat({ unauthenticate }) {
     const [tab, setTab] = useState("chat");
     const [prevTab, setPrevTab] = useState(tab);
+    const [userInfo, setUserInfo] = useState({});
     const [conversationList, setConversationList] = useState([]);
     const [lastMessage, setLastMessage] = useState({});
     const [errored, setErrored] = useState(false);
     const [friendRequestList, setFriendRequestList] = useState([]);
     const [selectingFriendRequest, setSelectingFriendRequest] = useState({});
-    const [userInfo, setUserInfo] = useState({});
+    const [strangerList, setStrangerList] = useState([]);
 
     let fetchConversationList = (query) => {
         ClientInstance.getConversationList(query)
@@ -87,6 +88,19 @@ export default function Chat({ unauthenticate }) {
             })
     }
 
+    let fetchNotFriendList = (query) => {
+        ClientInstance.getNotFriendList(query)
+            .then((response) => {
+                let newStrangerList = response.data.map(stranger => new UserInfoResponse(stranger, "http"));
+        
+                setStrangerList(newStrangerList);
+            })
+            .catch((error) => {
+                console.error('An error occurred: ' + error);
+                setErrored(true);
+            })
+    }
+
     let fetchUserInfo = (callback) => {
         ClientInstance.getUserInfo()
             .then((response) => {
@@ -105,6 +119,7 @@ export default function Chat({ unauthenticate }) {
             fetchConversationList();
             fetchLastMessages();
             fetchFriendRequests();
+            fetchNotFriendList();
         });
     }, []);
 
@@ -133,13 +148,14 @@ export default function Chat({ unauthenticate }) {
             : tab == "friends"? (
                 <div>
                     <ModalContainer modalName="addFriend" fullname="Add Friend">
-                        <AddFriendModal />
+                        <AddFriendModal strangerList={strangerList} handleSearch={fetchNotFriendList}/>
                     </ModalContainer>
                     <ModalContainer modalName="friendRequest" fullname={"Friend Request From " + selectingFriendRequest.fromUser}>
                         <FriendRequestModal
                             friendRequest={selectingFriendRequest}
                             friendRequestList={friendRequestList}
                             setFriendRequestList={setFriendRequestList}
+                            fetchNotFriendList={fetchNotFriendList}
                         />
                     </ModalContainer>
                 </div>
