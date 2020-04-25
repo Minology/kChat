@@ -21,6 +21,9 @@ bash:
 migrate:
 	docker exec -it kchat_web python3 manage.py makemigrations
 	docker exec -it kchat_web python3 manage.py migrate
-    
+
+backup:
+	docker-compose exec db /usr/bin/mysqldump kchat > db_data/dump.sql
+
 test:
 	docker exec -it utdvn_web bash scripts/test.sh

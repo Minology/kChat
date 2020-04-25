@@ -7,6 +7,7 @@ A webchat application
 * [Installation](#installation)
 * [Usage](#usage)
   * [Logging in the admin site](#logging-in-the-admin-site)
+  * [Accessing phpMyAdmin](#accessing-phpMyAdmin)
   * [Chatting](#chatting)
 
 ## Installation
@@ -37,6 +38,9 @@ $ docker-compose exec web python manage.py createsuperuser
 ### Logging in the admin site
 - Go to http://127.0.0.1:8000/admin
 - To view documentation, go to http://127.0.0.1:8000/admin/doc
+
+### Accessing phpMyAdmin
+- To access your MySQL user interface, go to http://127.0.0.1:8888
 
 ### Chatting
 - Go to http://127.0.0.1:8080
