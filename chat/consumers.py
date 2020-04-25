@@ -243,8 +243,12 @@ class ChatConsumer(WebsocketConsumer):
         for participant in participants:
             conversation = participant.conversation
             message = Message.objects.filter(conversation=conversation).latest('created_at')
-            last_seen_message = Message.objects.filter(pk=participant.last_seen_message_id)[0]
-            unread_counts.append(message.order_in_conversation - last_seen_message.order_in_conversation)
+            last_seen_message = Message.objects.filter(pk=participant.last_seen_message_id)
+            if last_seen_message.exists():
+                last_seen_message = last_seen_message[0]
+                unread_counts.append(message.order_in_conversation - last_seen_message.order_in_conversation)
+            else:
+                unread_counts.append(message.order_in_conversation)
             messages.append(message)
         content = {
             'command': 'last_messages',
