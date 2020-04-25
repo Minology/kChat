@@ -12,7 +12,7 @@ export default class Conversation extends React.Component {
             errored: false
         }
         
-        WebSocketInstance.waitForSocketConnection(this.props.details.id, 100, () => {
+        WebSocketInstance.connectAndWait(this.props.details.id, 100, () => {
             WebSocketInstance.addCallbacks({
                 'messages': this.setMessageList,
                 'new_message': this.getMessage
@@ -67,7 +67,6 @@ export default class Conversation extends React.Component {
 
     sendMessage = (message) => {
         const messageObject = {
-            from: this.props.currentUser,
             conversationId: this.props.details.id,
             attachmentType: "Only text",
             content: message,

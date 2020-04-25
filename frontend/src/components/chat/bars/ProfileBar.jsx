@@ -4,7 +4,7 @@ import {
 } from 'react-router-dom';
 import Profile from '../../auth/Profile.jsx';
 
-export default function ProfileBar({ userInfo }) {
+export default function ProfileBar({ userInfo, unauthenticate }) {
     return (
         <div className="chat-profilebar">
             <div className="chat-left-headbar">
@@ -20,7 +20,14 @@ export default function ProfileBar({ userInfo }) {
                         </ul>
                     </div>
                     <div className="col-3">
-                        <Link to="/login" data-toggle="tooltip" data-placement="right" title="" data-original-title="Logout">
+                        <Link 
+                            to="/login"
+                            data-toggle="tooltip"
+                            data-placement="right"
+                            title=""
+                            data-original-title="Logout"
+                            onClick={unauthenticate}
+                        >
                             <i className="feather icon-log-out"></i>
                         </Link>
                     </div>

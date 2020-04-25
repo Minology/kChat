@@ -12,13 +12,11 @@ export default class AddRequestModal extends React.Component {
             chosenUser: undefined,
         }
         
-        WebSocketInstance.connect();
-        
-        WebSocketInstance.waitForSocketConnection(0, 100, () => {
+        WebSocketInstance.connectAndWait(0, 100, () => {
             WebSocketInstance.addCallbacks({
                 'fetch_not_friends': this.setStrangerList,
             });
-            WebSocketInstance.fetchNotFriends(this.props.currentUser);
+            WebSocketInstance.fetchNotFriends();
         });
     }
 
@@ -48,7 +46,7 @@ export default class AddRequestModal extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        WebSocketInstance.sendFriendRequest(this.props.currentUser, this.state.chosenUser);
+        WebSocketInstance.sendFriendRequest(this.state.chosenUser);
         this.refs.hiddenButton.click();
     }
 

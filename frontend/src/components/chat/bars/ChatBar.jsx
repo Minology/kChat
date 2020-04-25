@@ -12,7 +12,7 @@ export default function ChatListBar({ conversations, lastMessage }) {
                             <li className="media">
                                 <img className="align-self-center mr-2" src="../../../../public/assets/images/logo.svg" alt="Generic placeholder image"/>
                                 <div className="media-body">
-                                    <h5 className="mb-0 mt-2">Chat</h5>
+                                    <h5 className="mb-0 mt-2">kChat</h5>
                                 </div>
                             </li>
                         </ul>

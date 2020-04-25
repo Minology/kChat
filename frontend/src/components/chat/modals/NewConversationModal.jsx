@@ -13,15 +13,13 @@ export default class NewConversationModal extends React.Component {
             usersToAdd: {},
         }
         
-        WebSocketInstance.connect();
-        
-        WebSocketInstance.waitForSocketConnection(0, 100, () => {
+        WebSocketInstance.connectAndWait(0, 100, () => {
             WebSocketInstance.addCallbacks({
                 'fetch_all_friends': this.setFriendList,
                 'create_conversation': this.addUsers,
                 'add_user_to_conversation': this.handleFailedAddUserRequest,
             });
-            WebSocketInstance.fetchFriends(this.props.currentUser);
+            WebSocketInstance.fetchFriends();
         });
     }
 
@@ -52,8 +50,7 @@ export default class NewConversationModal extends React.Component {
             }]);
             if (this.props.currentUser != response.conversation.creator_username) return;
 
-            WebSocketInstance.connect(conversation.conversation_id);
-            WebSocketInstance.waitForSocketConnection(conversation.conversation_id, 100, () => {
+            WebSocketInstance.connectAndWait(conversation.conversation_id, 100, () => {
                 Object.keys(this.state.usersToAdd).filter((k) => this.state.usersToAdd[k]).forEach((username) => {
                     WebSocketInstance.addUserToConversation(conversation.conversation_id, username);
                 });
@@ -66,7 +63,7 @@ export default class NewConversationModal extends React.Component {
         else {
             if (this.props.currentUser != response.conversation.creator_username) return;
             console.log("Creating new conversation failed. Let's try again...");
-            WebSocketInstance.newConversation(this.state.newConversationName, this.props.currentUser);
+            WebSocketInstance.newConversation(this.state.newConversationName);
         }
     }
 
@@ -95,7 +92,7 @@ export default class NewConversationModal extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        WebSocketInstance.newConversation(this.state.newConversation, this.props.currentUser);
+        WebSocketInstance.newConversation(this.state.newConversation);
     }
 
     getUsersToAddAvatars = () => {

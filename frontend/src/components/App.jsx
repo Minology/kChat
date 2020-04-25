@@ -1,40 +1,68 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {
     Switch,
     Route
 } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute.jsx';
-import Client from '../client.js';
 import NotFoundPage from './NotFoundPage.jsx';
 import HomePage from './home/HomePage.jsx';
 import LoginPage from './auth/LoginPage.jsx';
+import SignupPage from './auth/SignupPage.jsx';
+import ForgotPasswordPage from './auth/ForgotPasswordPage.jsx';
 import ChatPage from './chat/ChatPage.jsx';
+import AxiosInstance from '../services/Axios.js';
 
 export default class App extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            username: '',
-            isAuthenticated: false
+            isAuthenticated: true,
+            remember: true
         };
-
-        this.authenticate = this.authenticate.bind(this);
     }
 
-    authenticate(username, cb) {
+    authenticate = (callback) => {
         this.setState({ 
-            username: username,
             isAuthenticated: true 
         });
-        cb();
+        callback();
+    }
+
+    unauthenticate = () => {
+        this.setState({
+            isAuthenticated: false
+        });
+        localStorage.removeItem('refresh_token');
+        AxiosInstance.defaults.headers['Authorization'] = null;
+    }
+
+    setRemember = (remember) => {
+        this.setState({
+            remember: remember
+        });
+    }
+
+    componentCleanup = () => {
+        if (!this.state.remember) {
+            localStorage.removeItem('refresh_token');
+            AxiosInstance.defaults.headers['Authorization'] = null;
+        }
+    }
+
+    componentDidMount() {
+        window.addEventListener('beforeunload', this.componentCleanup);
+    }
+
+    componentWillUnmount() {
+        this.componentCleanup();
+        window.removeEventListener('beforeunload', this.componentCleanup);
     }
 
     render() {
         const {
-            username,
-            isAuthenticated
+            isAuthenticated,
+            remember
         } = this.state;
 
         return (
@@ -44,10 +72,21 @@ export default class App extends React.Component {
                         <HomePage />
                     </Route>
                     <Route exact path="/login">
-                        <LoginPage authenticate={this.authenticate} />
+                        <LoginPage
+                            unauthenticate={this.unauthenticate}
+                            authenticate={this.authenticate}
+                            remember={remember}
+                            setRemember={this.setRemember}
+                        />
+                    </Route>
+                    <Route exact path="/signup">
+                        <SignupPage/>
+                    </Route>
+                    <Route exact path="/forgotpsw">
+                        <ForgotPasswordPage/>
                     </Route>
                     <PrivateRoute authed={isAuthenticated} path="/chat">
-                        <ChatPage client={this.props.client} currentUser={username} />
+                        <ChatPage unauthenticate={this.unauthenticate} />
                     </PrivateRoute>
                     <Route>
                         <NotFoundPage />
@@ -56,8 +95,4 @@ export default class App extends React.Component {
             </div>
         );
     }
-}
-
-App.propTypes = {
-	client: PropTypes.instanceOf(Client)
 }

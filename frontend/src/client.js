@@ -1,21 +1,13 @@
-import "whatwg-fetch"
+import AxiosInstance from './services/Axios.js';
 
-export default class Client {
-    constructor(url) {
-        this.url = url;
-    }
+class Client {
+    static instance = null;
 
-    /**
-     * Returns a string representation of the given parameters to be used in a HTTP request.
-     * @param {Object} params A JSON object of key-value pairs representing the parameters of a request.
-     */
-    static _stringParams(params) {
-        if (params === undefined) return '';
-        let paramList = [];
-        for (var key in params) {
-            paramList.push(key + '=' + params[key]);
+    static getInstance() {
+        if (!Client.instance) {
+            Client.instance = new Client();
         }
-        return '?' + paramList.join('&');
+        return Client.instance;
     }
 
     /**
@@ -27,12 +19,15 @@ export default class Client {
      */
     async _get(endpoint, params) {
         try {
-            const uri = this.url + endpoint + Client._stringParams(params);
-            const response = await fetch(uri);
-            return await response.json();
+            const response = AxiosInstance.get(endpoint, {params: params});
+            return await response;
         } catch (e) {
             throw e;
         }
+    }
+
+    async getUserInfo() {
+        return await this._get('accounts/user');
     }
 
     async getConversationList(username) {
@@ -43,11 +38,38 @@ export default class Client {
         return await this._get('chat/conv', params);
     }
 
-    async getMessageList(conversationId) {
-        const params = {
-            conv: conversationId,
-        };
+    async _post(endpoint, data) {
+        try {
+            const response = AxiosInstance.post(endpoint, data);
+            return await response;
+        } catch (e) {
+            throw e;
+        }
+    }
 
-        return await this._get('chat/message', params);
+    async postLogin(email, password) {
+        const data = {
+            email: email,
+            password: password,
+        }
+
+        return await this._post('accounts/login/', data);
+    }
+
+    async postSignup(username, email, password, repassword, firstName, lastName) {
+        const data = {
+            username: username,
+            email: email,
+            password1: password,
+            password2: repassword,
+            first_name: firstName,
+            last_name: lastName,
+        }
+
+        return await this._post('accounts/registration/', data);
     }
 }
+
+const ClietInstance = Client.getInstance();
+
+export default ClietInstance;
