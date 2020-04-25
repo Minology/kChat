@@ -8,7 +8,7 @@ export default class FriendRequestModal extends React.Component {
         WebSocketInstance.connectAndWait(0, 100, () => {
             WebSocketInstance.addCallbacks({
                 'accept_friend_request': this.handleResponse,
-                'decline_friend_request': this.handleResponse,
+                'discard_friend_request': this.handleResponse,
             });
         });
     }
