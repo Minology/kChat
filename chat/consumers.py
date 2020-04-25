@@ -185,7 +185,7 @@ class ChatConsumer(WebsocketConsumer):
         from_user = self.user
         to_user = get_user(data['to_username'])
         connection = Connection.objects.filter(from_user=from_user, to_user=to_user)
-        if (connection is not None):
+        if connection.exists():
             raise IntegrityError('Connection already exists')
         request_message = data['request_message']
         request, created = FriendRequest.objects.get_or_create(

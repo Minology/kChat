@@ -53,7 +53,7 @@ class ConversationParticipantListView(ListAPIView):
             return Response(error_msg, status=status.HTTP_404_NOT_FOUND)
 
         # get participants
-        participants = Participant.objects.filter(conversation=conversation)
+        participants = Participant.objects.filter(conversation=instance)
         serializer = ParticipantSerializer(participants, many=True)
 
         # check superuser
@@ -87,11 +87,11 @@ class ConversationNonParticipantListView(ListAPIView):
             return Response(error_msg, status=status.HTTP_404_NOT_FOUND)
 
         # get participants
-        participants = Participant.objects.filter(conversation=conversation)
+        participants = Participant.objects.filter(conversation=instance)
         participants_id = []
         for participant in participants:
-            participants_id.append(participant.id)
-        outsiders = User.objects.exclude(id__in=participants_id)
+            participants_id.append(participant.user.id)
+        outsiders = User.objects.exclude(id__in=participants_id)[:50]
         serializer = UserDetailsSerializer(outsiders, many=True)
 
         # check superuser
