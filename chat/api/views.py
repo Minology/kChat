@@ -39,18 +39,24 @@ class ConversationParticipantListView(ListAPIView):
     serializer_class = ConversationSerializer
 
     def list(self, request, *args, **kwargs):
-        error_notfound = {'detail': 'Resource not found'}
         error_forbidden = {'detail': 'Forbidden resource'}
+        error_notfound = {'detail': 'Resource not found'}
+
         instance = self.get_object()
 
-        # check anonymous
-        user = self.request.user
-        if user.is_anonymous:
+        #check anonymous
+        auth_token = self.request.auth
+        user_id = auth_token.user_id
+        user_ = User.objects.filter(id=user_id)
+        if len(user_) > 1:
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
+        if len(user_) < 1:
             return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+        user = user_[0]
 
         # get conversation
         if instance is None:
-            return Response(error_msg, status=status.HTTP_404_NOT_FOUND)
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
 
         # get participants
         participants = Participant.objects.filter(conversation=instance)
@@ -73,18 +79,23 @@ class ConversationNonParticipantListView(ListAPIView):
     serializer_class = ConversationSerializer
 
     def list(self, request, *args, **kwargs):
-        error_notfound = {'detail': 'Resource not found'}
         error_forbidden = {'detail': 'Forbidden resource'}
+        error_notfound = {'detail': 'Resource not found'}
         instance = self.get_object()
 
         # check anonymous
-        user = self.request.user
-        if user.is_anonymous:
+        auth_token = self.request.auth
+        user_id = auth_token.user_id
+        user_ = User.objects.filter(id=user_id)
+        if len(user_) > 1:
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
+        if len(user_) < 1:
             return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+        user = user_[0]
 
         # get conversation
         if instance is None:
-            return Response(error_msg, status=status.HTTP_404_NOT_FOUND)
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
 
         # get participants
         participants = Participant.objects.filter(conversation=instance)
@@ -116,13 +127,18 @@ class ConversationDeleteView(DestroyAPIView):
         instance = self.get_object()
 
         # check anonymous
-        user = self.request.user
-        if user.is_anonymous:
+        auth_token = self.request.auth
+        user_id = auth_token.user_id
+        user_ = User.objects.filter(id=user_id)
+        if len(user_) > 1:
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
+        if len(user_) < 1:
             return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+        user = user_[0]
 
         # get conversation
         if instance is None:
-            return Response(error_msg, status=status.HTTP_404_NOT_FOUND)
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
 
         if (user.id != instance.creator.id):
             return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
@@ -198,11 +214,17 @@ class UserConversationsListView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         error_forbidden = {'detail': 'Forbidden resource'}
+        error_notfound = {'detail': 'Resource not found'}
 
         # check anonymous
-        user = self.request.user
-        if user.is_anonymous:
+        auth_token = self.request.auth
+        user_id = auth_token.user_id
+        user_ = User.objects.filter(id=user_id)
+        if len(user_) > 1:
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
+        if len(user_) < 1:
             return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+        user = user_[0]
 
         participants = Participant.objects.filter(user=user)
         conversations = []
@@ -229,11 +251,17 @@ class UserFriendsOutOfConversationListView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         error_forbidden = {'detail': 'Forbidden resource'}
+        error_notfound = {'detail': 'Resource not found'}
 
         # check anonymous
-        user = self.request.user
-        if user.is_anonymous:
+        auth_token = self.request.auth
+        user_id = auth_token.user_id
+        user_ = User.objects.filter(id=user_id)
+        if len(user_) > 1:
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
+        if len(user_) < 1:
             return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+        user = user_[0]
 
         # check user in conversation
         conversation = self.get_object()
@@ -267,11 +295,17 @@ class UserFriendListView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         error_forbidden = {'detail': 'Forbidden resource'}
+        error_notfound = {'detail': 'Resource not found'}
 
         # check anonymous
-        user = self.request.user
-        if user.is_anonymous:
+        auth_token = self.request.auth
+        user_id = auth_token.user_id
+        user_ = User.objects.filter(id=user_id)
+        if len(user_) > 1:
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
+        if len(user_) < 1:
             return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+        user = user_[0]
 
         connections = user.connections.all()
         friends = []
@@ -288,11 +322,17 @@ class UserNotFriendListView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         error_forbidden = {'detail': 'Forbidden resource'}
+        error_notfound = {'detail': 'Resource not found'}
 
         # check anonymous
-        user = self.request.user
-        if user.is_anonymous:
+        auth_token = self.request.auth
+        user_id = auth_token.user_id
+        user_ = User.objects.filter(id=user_id)
+        if len(user_) > 1:
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
+        if len(user_) < 1:
             return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+        user = user_[0]
 
         connections = user.connections.all()
         friends_id = [user.id]
@@ -314,11 +354,17 @@ class UserFriendRequestView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         error_forbidden = {'detail': 'Forbidden resource'}
+        error_notfound = {'detail': 'Resource not found'}
 
         # check anonymous
-        user = self.request.user
-        if user.is_anonymous:
+        auth_token = self.request.auth
+        user_id = auth_token.user_id
+        user_ = User.objects.filter(id=user_id)
+        if len(user_) > 1:
+            return Response(error_notfound, status=status.HTTP_404_NOT_FOUND)
+        if len(user_) < 1:
             return Response(error_forbidden, status=status.HTTP_403_FORBIDDEN)
+        user = user_[0]
 
         friend_requests = user.friend_requests.all()
         serializer = FriendRequestSerializer(friend_requests, many=True)
