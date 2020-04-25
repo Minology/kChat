@@ -2,8 +2,9 @@ from channels.auth import AuthMiddlewareStack
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import AnonymousUser
 from django.db import close_old_connections
-# from channels.db import database_sync_to_async
+from channels.db import database_sync_to_async
 
+@database_sync_to_async
 def get_user(token_key):
     try:
         token = Token.objects.get(key=token_key)
@@ -22,13 +23,13 @@ class TokenAuthMiddlewareInstance:
         self.scope = dict(scope)
         self.inner = self.middleware.inner
 
-    def __call__(self, receive, send):
+    async def __call__(self, receive, send):
         query = dict((x.split('=') for x in self.scope['query_string'].decode().split("&")))
         if 'token' in query:
             token_key = query['token']
-            self.scope['user'] = get_user(token_key)
+            self.scope['user'] = await get_user(token_key)
         inner = self.inner(self.scope)
-        return inner(receive, send)
+        return await inner(receive, send)
 
 class TokenAuthMiddleware:
     def __init__(self, inner):

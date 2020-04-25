@@ -25,10 +25,10 @@ urlpatterns = [
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('admin/', admin.site.urls),
     #path('api-auth/', include('rest_framework.urls')),
-    path('chat/', include('chat.api.urls', namespace='chat')),
+    path('api/', include('chat.api.urls', namespace='api')),
 
     # The view from the urlpattern below is for sample only
-    path('chatview/', include('chat.urls', namespace='chatview')),
+    path('chat/', include('chat.urls', namespace='chat')),
 
     #accounts
     path('accounts/', include('accounts.urls')),

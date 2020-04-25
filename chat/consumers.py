@@ -24,7 +24,6 @@ class ChatConsumer(WebsocketConsumer):
         conversation = get_conversation(data['conversation_id'])
         sender = self.user
         get_participant(sender, conversation)
-        conversation = get_conversation(data['conversation_id'])
         conversation.message_count += 1
         attachment_type = get_attachment_type(data['attachment_type'])
         message = Message.objects.create(
@@ -38,10 +37,10 @@ class ChatConsumer(WebsocketConsumer):
         conversation.save()
         content = {
             'command': 'new_message',
-            'message': self.message_to_json(message)
+            'message': self.message_to_json(message),
+            'log': 'Command executed successfully'
         }
-        self.send_chat_message(content)
-        return content
+        return self.send_chat_message(content)
         
     def messages_to_json(self, messages):
         result = []
@@ -83,16 +82,19 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         data = json.loads(text_data)
         content = {}
-        try:
-            content = self.commands[data['command']](self, data)
-            content['log'] = 'Command executed successfully'
-        except Exception as e:
-            content['log'] = str(e.__class__.__name__) + " error : " + str(e.__context__)
-            traceback.print_exc()
-        finally:
-            self.send_data(content)
+        if data['command'] != 'new_message':
+            try:
+                content = self.commands[data['command']](self, data)
+                content['log'] = 'Command executed successfully'
+            except Exception as e:
+                content['log'] = str(e.__class__.__name__) + " error : " + str(e.__context__)
+                traceback.print_exc()
+            finally:
+                self.send_data(content)
+        else:
+            self.commands[data['command']](self, data)
             
-
+            
     def send_chat_message(self, message):
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
@@ -109,6 +111,7 @@ class ChatConsumer(WebsocketConsumer):
 
     def chat_message(self, event):
         message = event['message']
+        self.send(text_data=json.dumps(message))
 
 
     def add_user_to_conversation(self, data):

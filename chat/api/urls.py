@@ -16,7 +16,7 @@ from .views import (
     AttachmentTypeListView,
 )
 
-app_name = 'chat'
+app_name = 'api'
 
 urlpatterns = [
     path('conv/', ConversationListView.as_view()),
