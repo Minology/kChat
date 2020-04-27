@@ -7,7 +7,7 @@
   "main": "index.js",
   "private": true,
   "dependencies": {
-    "axios": "0.19.2",
+    "axios": "^0.19.2",
     "babel-jest": "^25.1.0",
     "coveralls": "^3.0.9",
     "css-loader": "^3.4.2",
@@ -30,14 +30,15 @@
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",
-    "@babel/plugin-proposal-class-properties": "7.8.3",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/preset-env": "^7.8.6",
     "@babel/preset-react": "^7.8.3",
     "babel-loader": "^8.0.6"
   },
   "scripts": {
     "start": "webpack-dev-server",
-    "test-coverage": "yarn jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "test": "jest --coverage",
+    "ci-process-cover": "cat ./coverage/lcov.info | coveralls"
   },
   "eslintConfig": {
     "extends": "react-app"
