@@ -1,0 +1,39 @@
+matrix:
+  include:
+    - language: python
+
+      python:
+        - 3.8
+
+      services:
+        - docker
+        - mysql
+
+      install:
+        - docker-compose up -d channel
+        - pip install -r requirements.txt
+
+      before_script:
+        - mysql -e 'CREATE DATABASE test;' -u root
+
+      script:
+        - bash scripts/test.sh
+
+      after_script:
+        - coveralls
+
+    - language: node_js
+
+      node_js:
+        - 10
+
+      before_install:
+        - cd frontend
+
+      script:
+        - yarn test-coverage
+
+notifications:
+  email:
+    on_success: never
+    on_failure: never

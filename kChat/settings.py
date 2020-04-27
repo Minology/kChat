@@ -97,18 +97,32 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'kchat',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'db',
-        'PORT': '3306',
-        'default-character-set': 'utf8',
-        'TIME_ZONE': 'Asia/Saigon',
+if 'TRAVIS' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'test',
+            'USER': 'root',
+            'PASSWORD': '',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+            'default-character-set': 'utf8',
+            'TIME_ZONE': 'Asia/Saigon',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'kchat',
+            'USER': 'root',
+            'PASSWORD': 'root',
+            'HOST': 'db',
+            'PORT': '3306',
+            'default-character-set': 'utf8',
+            'TIME_ZONE': 'Asia/Saigon',
+        }
+    }
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8080',
