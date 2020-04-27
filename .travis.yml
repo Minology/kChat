@@ -26,7 +26,7 @@ matrix:
         provider: heroku
         api_key:
           secure: KEY
-        app: kChat
+        app: k-chatapp
         on: dev
 
     - language: node_js
