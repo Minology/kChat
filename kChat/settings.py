@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
+    'django_nose',
     'chat',
     'channels',
     'rest_framework',
@@ -130,6 +131,19 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Test runners
+# https://django-testing-docs.readthedocs.io/en/latest/coverage.html#configure-django-nose
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=accounts,chat',
+    '--exe',
+    '--cover-erase',
+]
+
+NOSE_IGNORE_CONFIG_FILES = True,
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

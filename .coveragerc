@@ -1,0 +1,14 @@
+[run]
+omit = 
+    */settings.py   
+    */apps.py
+    */admin.py
+    accounts/models.py
+
+[report]
+omit = 
+    */tests.py
+    */settings.py
+    */apps.py
+    */admin.py
+    accounts/models.py

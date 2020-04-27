@@ -9,6 +9,7 @@ A webchat application
   * [Logging in the admin site](#logging-in-the-admin-site)
   * [Accessing phpMyAdmin](#accessing-phpMyAdmin)
   * [Chatting](#chatting)
+* [Testing](#testing)
 
 ## Installation
 
@@ -44,3 +45,14 @@ $ docker-compose exec web python manage.py createsuperuser
 
 ### Chatting
 - Go to http://127.0.0.1:8080
+
+## Testing
+- To test the backend:
+```Shell
+$ docker-compose exec web bash scripts/test.sh
+```
+
+- To test the frontend:
+```Shell
+$ yarn jest --coverage
+```

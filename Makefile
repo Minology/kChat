@@ -26,4 +26,4 @@ backup:
 	docker-compose exec db /usr/bin/mysqldump kchat > db_data/dump.sql
 
 test:
-	docker exec -it utdvn_web bash scripts/test.sh
+	docker exec -it kchat_web bash scripts/test.sh

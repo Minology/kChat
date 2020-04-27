@@ -95,7 +95,7 @@ fixtures/dom/public/react-dom.js
 fixtures/dom/public/react.js
 
 # testing
-/coverage
+coverage/
 test/the-files-to-test.generated.js
 
 # production
