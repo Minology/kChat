@@ -100,3 +100,5 @@ test/the-files-to-test.generated.js
 
 # production
 /build
+
+package-lock.json
