@@ -20,8 +20,8 @@ matrix:
       api_key:
         secure: qas6PrPyrwt1IOEHUjjJsQFfZnDQzb/JiMMNHlpzyGn0l3l5yowEe7hQ1b8tgwzPC4+eOX3/tAkhu3yBXSpcLZ6p4TELYVSiDn4XtrJZsU75EFi/ijSn3OLTZBu54X11N24+G539eidVEohjyYUBOJsjWV/uwfVC6do6Oa31dq/Ri5GS2e2p1+nssrQ81DqjHRS0kg0x66uxv5Le/QqmMz41pEDsMLZ0Apr/jhOI5S28SNB3/YBQjFoOVR8NcodatzWMShj+wxNLdTign9Onap1tsb/n47me2MMWd60xRs1X/PBbzHpukbhFAysxPUn0YvLkJ8Bi5gxEo1tgwp2slWymTSQmEz9+Sqy6n9zWZ0SI5YQfwHYfmjBXehYGi1iv39S4PVpYsB52QzJ2/Yt4ZvOyHud41Z2Jrs6sLaegYCU5kesOws96N453s4sLme3XEeYMKOhAQgfyQdgFKXPfMo70trgxqXuTlo668/hGZrshpOoB9k0QHtJOQQZ8266AtYB61oVNlOC8WoxT6ghTNHN7Jxwo5X8ciuO+/lUGhbOlX+Ccp0gd/zoFXfBpHnpT8kMl/KViFhphuiE5FJkhubhVKwFnTbyt1rdaWrM1MYIUV3dMOxmox5gHFYBHEeUC60pb1s8/NY/yHpUWNjHn/QgvHSzi2IZ23ERstHSeHXk=
       app: k-chatapp
-        on:
-          repo: Minology/kChat
+      on:
+        repo: Minology/kChat
   - language: node_js
     node_js:
     - 10
