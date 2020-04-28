@@ -1,6 +1,0 @@
-[mysqld]
-default_authentication_plugin=mysql_native_password
-
-[mysqldump]
-user=root
-password=root
