@@ -1,49 +1,37 @@
 matrix:
   include:
-    - language: python
-
-      python:
-        - 3.8
-
-      services:
-        - docker
-        - mysql
-
-      install:
-        - docker-compose up -d channel
-        - pip install -r requirements.txt
-
-      before_script:
-        - mysql -e 'CREATE DATABASE test;' -u root
-
-      script:
-        - bash scripts/test.sh
-
-      after_script:
-        - coveralls
-        
-      deploy:
-        provider: heroku
-        api_key:
-          secure: aiXLE3S8tB3PDdhMrtcmKO9275Q0Sqpc2J+Tx/eea7x+X/cYhwbAqArgQrkOdMsKaJAJVtZX8gXIbzGfV815+0rKY4htFuneSsQooMqhqngbf3IremVFhvz1JyvTK0iR00Q4LWd2IOQlL7QFmvPSvVMS44V6LaObGt91Wa0Vj7kbWBIgASwqFV3TtLJTIQXrj3fl2lkUIrqk/mf+iSyInSHfrAaOHH8KTnqqcTRXJsKRzADjKak0n/oB6DefaLL23/E4h+9Ie7hUPI6bgT3HO4OLWv0ZRsLSzwhEafSAy9Le0X4Bz8v9eXfC6663xbzUhZg4fDprRL2R4aaJSS/4I3775BL4XRhIC0EUFaR2xoFbfX9usXsV8J49RIImqHE84k5FB/Oe8XimCnyruMPqmF6XPruR76BTLN6rCNgVyxmAWk3k5HG3/v9z+Yv2Kfwl4JW5Ff+PgCtS6fYY54AEzouqAxuYygDwxNRh1CkwJfIEjcJQ3FgqHogE54x1bAQ2En4lD38SUtniTbyDU5Vx21QvM1hVZvxxG1EukMDCZ2+wbW3TfHhySOAj4UMe34IDW+1bpygFvgSPIHi2UWu3Ort7By3GPpYMde7Meg+zcu7UVCx4fJIk9eRVzMyV2vAabOQFcrjUBSpnnexaZomuSXyblY3CEM4w09Jtzvnx2lo=
-        app: k-chatapp
-        on: heroku
-
-    - language: node_js
-
-      node_js:
-        - 10
-
-      before_install:
-        - cd frontend
-
-      script:
-        - yarn test
-        
-      after_script:
-        - yarn ci-process-cover
-
+  - language: python
+    python:
+    - 3.8
+    services:
+    - docker
+    - mysql
+    install:
+    - docker-compose up -d channel
+    - pip install -r requirements.txt
+    before_script:
+    - mysql -e 'CREATE DATABASE test;' -u root
+    script:
+    - bash scripts/test.sh
+    after_script:
+    - coveralls
+    
+  - language: node_js
+    node_js:
+    - 10
+    before_install:
+    - cd frontend
+    script:
+    - yarn test
+    after_script:
+    - yarn ci-process-cover
 notifications:
   email:
     on_success: never
     on_failure: never
+deploy:
+  provider: heroku
+  api_key:
+    secure: qas6PrPyrwt1IOEHUjjJsQFfZnDQzb/JiMMNHlpzyGn0l3l5yowEe7hQ1b8tgwzPC4+eOX3/tAkhu3yBXSpcLZ6p4TELYVSiDn4XtrJZsU75EFi/ijSn3OLTZBu54X11N24+G539eidVEohjyYUBOJsjWV/uwfVC6do6Oa31dq/Ri5GS2e2p1+nssrQ81DqjHRS0kg0x66uxv5Le/QqmMz41pEDsMLZ0Apr/jhOI5S28SNB3/YBQjFoOVR8NcodatzWMShj+wxNLdTign9Onap1tsb/n47me2MMWd60xRs1X/PBbzHpukbhFAysxPUn0YvLkJ8Bi5gxEo1tgwp2slWymTSQmEz9+Sqy6n9zWZ0SI5YQfwHYfmjBXehYGi1iv39S4PVpYsB52QzJ2/Yt4ZvOyHud41Z2Jrs6sLaegYCU5kesOws96N453s4sLme3XEeYMKOhAQgfyQdgFKXPfMo70trgxqXuTlo668/hGZrshpOoB9k0QHtJOQQZ8266AtYB61oVNlOC8WoxT6ghTNHN7Jxwo5X8ciuO+/lUGhbOlX+Ccp0gd/zoFXfBpHnpT8kMl/KViFhphuiE5FJkhubhVKwFnTbyt1rdaWrM1MYIUV3dMOxmox5gHFYBHEeUC60pb1s8/NY/yHpUWNjHn/QgvHSzi2IZ23ERstHSeHXk=
+  app: k-chatapp
+      on: heroku
