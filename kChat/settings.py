@@ -24,7 +24,7 @@ SECRET_KEY = 'r^@a886-wua2@57c)#fi7_p0a+8r9-6u+=*!m$h@^zwpc#7kr9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'k-chatapp.herokuapp.com']
 
 # Application definition
 

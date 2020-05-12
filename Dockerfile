@@ -2,9 +2,15 @@
 FROM python:3.8
 # Set current working directory in the container
 WORKDIR /home/kchat
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DEBUG 0
 # Copy requirements into the docker container
 COPY requirements.txt ./
 # Install required Python packages
 RUN pip install -r requirements.txt
 # Copy the contents of the current working directory to the container
 COPY . .
+# Run gunicorn
+CMD gunicorn kChat.wsgi:application --bind 0.0.0.0:$PORT
