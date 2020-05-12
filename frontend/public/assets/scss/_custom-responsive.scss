@@ -4,7 +4,7 @@
 -----------------------------------
 */
 @media (min-width: 1300px) {
-    .chat-user-info {
+    .chat-info {
         display: none;
         &.show {
             display: block;
@@ -12,7 +12,7 @@
     }
 }
 @media (max-width: 1300px) and (min-width: 992px) {
-    .chat-user-info {
+    .chat-info {
         position: fixed;
         width: calc(100vw - 320px);
         right: 100%;
@@ -98,7 +98,7 @@
             left: 0;
         }
     }
-    .chat-user-info {
+    .chat-info {
         position: fixed;
         top: 0;
         bottom: 0;

@@ -28495,7 +28495,7 @@ mark {
   margin: 0 5px;
 }
 
-.chat-user-info {
+.chat-info {
   width: 320px;
   height: 100vh;
   background: #262B2E;
@@ -28505,82 +28505,82 @@ mark {
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
-.chat-user-info.show {
+.chat-info.show {
   display: block;
 }
-.chat-user-info .chat-user-head {
+.chat-info .chat-info-head {
   padding: 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   position: sticky;
   top: 0;
   background-color: #262B2E;
 }
-.chat-user-info .chat-user-head h5 {
+.chat-info .chat-info-head h5 {
   font-size: 15px;
   margin-bottom: 0;
   line-height: 40px;
 }
-.chat-user-info .chat-user-head li a {
+.chat-info .chat-info-head li a {
   color: #4c595f;
   font-size: 20px;
 }
-.chat-user-info .chat-user-head li a:hover {
+.chat-info .chat-info-head li a:hover {
   color: #19a299;
 }
-.chat-user-info .chat-user-body .userbar {
+.chat-info .chat-info-body .conversationbar {
   text-align: center;
   padding: 30px 0;
 }
-.chat-user-info .chat-user-body .userbar .user-pic {
+.chat-info .chat-info-body .conversationbar .conversation-pic {
   width: 100px;
   max-width: 100%;
   height: auto;
   border-radius: 50%;
 }
-.chat-user-info .chat-user-body .userbar h5 {
+.chat-info .chat-info-body .conversationbar h5 {
   margin-top: 30px;
 }
-.chat-user-info .chat-user-body .user-detail .user-detail-header {
+.chat-info .chat-info-body .conversation-detail .conversation-detail-header {
   padding: 15px;
   margin-bottom: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
-.chat-user-info .chat-user-body .user-detail .user-about {
+.chat-info .chat-info-body .conversation-detail .conversation-about {
   padding: 15px;
   margin-bottom: 5px;
 }
-.chat-user-info .chat-user-body .user-detail .user-media {
+.chat-info .chat-info-body .conversation-detail .conversation-file {
   padding: 15px;
   margin-bottom: 5px;
 }
-.chat-user-info .chat-user-body .user-detail .user-media .user-media-slider > i {
+.chat-info .chat-info-body .conversation-detail .conversation-file .conversation-file-slider > i {
   position: absolute;
   top: -45px;
   right: 0;
   font-size: 16px;
   z-index: 9;
 }
-.chat-user-info .chat-user-body .user-detail .user-media .user-media-slider > i:first-child {
+.chat-info .chat-info-body .conversation-detail .conversation-file .conversation-file-slider > i:first-child {
   right: 15px;
 }
-.chat-user-info .chat-user-body .user-detail .user-social {
+.chat-info .chat-info-body .conversation-detail .conversation-people {
   padding: 15px;
   margin-bottom: 5px;
 }
-.chat-user-info .chat-user-body .user-detail .user-social li a {
+.chat-info .chat-info-body .conversation-detail .conversation-people li a {
   font-size: 20px;
   margin-right: 10px;
 }
-.chat-user-info .chat-user-body .user-detail .user-social li a.facebook {
+.chat-info .chat-info-body .conversation-detail .conversation-people li a.facebook {
   color: #3C5B9A;
 }
-.chat-user-info .chat-user-body .user-detail .user-social li a.twitter {
+.chat-info .chat-info-body .conversation-detail .conversation-people li a.twitter {
   color: #1EA2F1;
 }
-.chat-user-info .chat-user-body .user-detail .user-social li a.instagram {
+.chat-info .chat-info-body .conversation-detail .conversation-people li a.instagram {
   color: #D2418F;
 }
-.chat-user-info .chat-user-body .user-detail .user-setting {
+.chat-info .chat-info-body .conversation-detail .conversation-setting {
   padding: 15px;
   margin-bottom: 5px;
 }
@@ -30079,15 +30079,15 @@ table.focus-on tfoot tr.focused td {
 -----------------------------------
 */
 @media (min-width: 1300px) {
-  .chat-user-info {
+  .chat-info {
     display: none;
   }
-  .chat-user-info.show {
+  .chat-info.show {
     display: block;
   }
 }
-@media (max-width: 1300px) and (min-width: 992px) {
-  .chat-user-info {
+@media (max-width: 320px) and (min-width: 992px) {
+  .chat-info {
     position: fixed;
     width: calc(100vw - 320px);
     right: 100%;
@@ -30097,7 +30097,7 @@ table.focus-on tfoot tr.focused td {
     z-index: 1020;
     visibility: hidden;
   }
-  .chat-user-info.show {
+  .chat-info.show {
     visibility: visible;
     right: 0;
   }
@@ -30121,7 +30121,7 @@ table.focus-on tfoot tr.focused td {
     border-right: 1px solid rgba(255, 255, 255, 0.03);
   }
 }
-@media (max-width: 991px) {
+@media (max-width: 320px) {
   h1 {
     font-size: 38px;
   }
@@ -30176,7 +30176,7 @@ table.focus-on tfoot tr.focused td {
     left: 0;
   }
 
-  .chat-user-info {
+  .chat-info {
     position: fixed;
     top: 0;
     bottom: 0;
@@ -30185,7 +30185,7 @@ table.focus-on tfoot tr.focused td {
     visibility: hidden;
     z-index: 1040;
   }
-  .chat-user-info.show {
+  .chat-info.show {
     visibility: visible;
     left: 0;
   }
