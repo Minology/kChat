@@ -80,6 +80,8 @@ export default class Conversation extends React.Component {
     render() {
         const currentUser = this.props.currentUser;
         const details = this.props.details;
+        const conversationInfoShown = this.props.conversationInfoShown;
+        const showConversationInfo = this.props.showConversationInfo;
         const messageList = this.state.messageList;
         const errored = this.state.errored;
         return (
@@ -99,7 +101,7 @@ export default class Conversation extends React.Component {
                             </ul>
                         </div>
                         <div className="col-6">
-                            <Call />
+                            <Call showConversationInfo={showConversationInfo}/>
                         </div>
                     </div>
                 </div>
@@ -116,7 +118,7 @@ export default class Conversation extends React.Component {
                         <div ref={(el) => { this.messagesEnd = el; }}/>
                     </div>
                 </div>
-                <div className="chat-bottom">
+                <div className={"chat-bottom" + (conversationInfoShown? " small":"")}>
                     <ConversationInput sendMessage={this.sendMessage}/>
                 </div>
             </div>

@@ -12,6 +12,7 @@ import NewConversationModal from './modals/NewConversationModal.jsx';
 import AddFriendModal from './modals/AddFriendModal.jsx';
 import FriendRequestModal from './modals/FriendRequestModal.jsx';
 import Conversation from './conversation/Conversation.jsx';
+import ConversationInfo from './conversation/ConversationInfo.jsx';
 import ChatMenu from './ChatMenu.jsx';
 import ChatBar from './bars/ChatBar.jsx';
 import FriendRequestBar from './bars/FriendRequestBar.jsx';
@@ -32,6 +33,7 @@ export default function Chat({ unauthenticate }) {
     const [friendRequestList, setFriendRequestList] = useState([]);
     const [selectingFriendRequest, setSelectingFriendRequest] = useState({});
     const [strangerList, setStrangerList] = useState([]);
+    const [conversationInfoShown, setConversationInfoShown] = useState(false);
 
     let fetchConversationList = (query) => {
         ClientInstance.getConversationList(query)
@@ -191,7 +193,14 @@ export default function Chat({ unauthenticate }) {
     let getConversationRoutes = () => {
         return conversationList.map((conversation, i) => (
             <Route key={i} exact path={`${match.path}/${conversation.id}`}>
-                <Conversation currentUser={userInfo.username} details={conversation} updateLastMessage={updateLastMessage}/>
+                <Conversation
+                    currentUser={userInfo.username}
+                    details={conversation}
+                    updateLastMessage={updateLastMessage}
+                    conversationInfoShown={conversationInfoShown}
+                    showConversationInfo={() => {setConversationInfoShown(true);}}
+                />
+                <ConversationInfo details={conversation} isShown={conversationInfoShown} hide={() => {setConversationInfoShown(false);}}/>
             </Route>
         ));
     }
