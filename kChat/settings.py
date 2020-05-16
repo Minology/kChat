@@ -24,7 +24,7 @@ SECRET_KEY = 'r^@a886-wua2@57c)#fi7_p0a+8r9-6u+=*!m$h@^zwpc#7kr9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 # Application definition
 
@@ -110,10 +110,14 @@ if 'TRAVIS' in os.environ:
             'NAME': 'test',
             'USER': 'root',
             'PASSWORD': '',
+            'PASSWORD': 'root',
             'HOST': '127.0.0.1',
             'PORT': '3306',
             'default-character-set': 'utf8',
             'TIME_ZONE': 'Asia/Saigon',
+            'TEST': {
+                'NAME': 'kchat',
+            }
         }
     }
 else:
@@ -127,8 +131,11 @@ else:
             'PORT': '3306',
             'default-character-set': 'utf8',
             'TIME_ZONE': 'Asia/Saigon',
+            'TEST':{
+                'NAME': 'kchat',
+            }
         }
-    }
+}
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8080',
